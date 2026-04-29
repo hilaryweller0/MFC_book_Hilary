@@ -1,0 +1,4387 @@
+#LyX 2.4 created this file. For more info see https://www.lyx.org/
+\lyxformat 620
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass book
+\use_default_options true
+\maintain_unincluded_children no
+\language british
+\language_package default
+\inputencoding utf8
+\fontencoding auto
+\font_roman "times" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_roman_osf false
+\font_sans_osf false
+\font_typewriter_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\float_placement class
+\float_alignment class
+\paperfontsize 12
+\spacing single
+\use_hyperref false
+\papersize a4
+\use_geometry true
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine natbib
+\cite_engine_type authoryear
+\biblio_style abbrvnat
+\biblio_options round
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\use_formatted_ref 0
+\use_minted 0
+\use_lineno 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 2.5cm
+\topmargin 2.5cm
+\rightmargin 2.5cm
+\bottommargin 2.5cm
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tablestyle default
+\tracking_changes false
+\output_changes false
+\change_bars false
+\postpone_fragile_content true
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\docbook_table_output 0
+\docbook_mathml_prefix 1
+\end_header
+
+\begin_body
+
+\begin_layout Chapter
+Numerics in Meteorology
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset toc
+LatexCommand tableofcontents
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Meteorology is the science of weather and climate.
+ The value of meteorology is prediction,
+ and the most powerful predictions use large models that numerically solve the equations governing the dynamics and physics of the atmosphere and ocean.
+ At the heart of these models are dynamical cores.
+ The dynamical core solves the partial differential equations that predict winds,
+ temperature,
+ pressure and the moisture content of the atmosphere.
+ This chapter will review some of the numerical methods used in the dynamical core of models of the atmosphere,
+ focusing on the requirements and constraints,
+ and the advantages and disadvantages of different methods and the different grids of the sphere.
+\end_layout
+
+\begin_layout Section
+The Early Days of Numerical Weather Prediction
+\end_layout
+
+\begin_layout Subsection
+L.
+ F.
+ Richardson's First Forecast
+\end_layout
+
+\begin_layout Standard
+The first attempt at numerical weather prediction was the heroic,
+ complex,
+ but naive hand calculations by 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "Rich22"
+literal "false"
+
+\end_inset
+
+,
+ who used finite differences to solve what we now call the three dimensional primitive equations.
+ I say naive because with hindsight we can see that his methods would fail,
+ even with modern super-computing.
+ But Richardson did not have the tools of scale analysis and numerical analysis that we have now.
+\end_layout
+
+\begin_layout Standard
+The primitive equations give the rate of change of the wind vector,
+ 
+\begin_inset Formula $\mathbf{u}$
+\end_inset
+
+,
+ the air density,
+ 
+\begin_inset Formula $\rho$
+\end_inset
+
+,
+ and the potential temperature,
+ 
+\begin_inset Formula $\theta$
+\end_inset
+
+:
+\begin_inset Formula 
+\begin{align}
+\frac{D\mathbf{u}}{Dt}+2\bm{\Omega}\times\mathbf{u}+\mathbf{g} & =-\frac{1}{\rho}\nabla p\label{eq:mom}\\
+\frac{D\rho}{Dt} & =-\rho\nabla\cdot\mathbf{u}\label{eq:cont}\\
+\frac{D\theta}{Dt} & =0.\label{eq:theta}
+\end{align}
+
+\end_inset
+
+where 
+\begin_inset Formula $\bm{\Omega}$
+\end_inset
+
+ is the rotation rate of the planet and 
+\begin_inset Formula $\mathbf{g}$
+\end_inset
+
+ is the acceleration due to gravity.
+ The total derivatives,
+ or advection operators of a quantity 
+\begin_inset Formula $\phi$
+\end_inset
+
+ are defined as
+\begin_inset Formula 
+\begin{equation}
+\frac{D\phi}{Dt}=\frac{\partial\phi}{\partial t}+\mathbf{u}\cdot\nabla\phi\label{eq:linAdvect}
+\end{equation}
+
+\end_inset
+
+which represents the rate of change of 
+\begin_inset Formula $\phi$
+\end_inset
+
+ following with the wind,
+ rather than the rate of change at a fixed point,
+ 
+\begin_inset Formula $\partial\phi/\partial t$
+\end_inset
+
+.
+ Advection the movement by the wind.
+ The potential temperature is a wonderful meteorological concept
+\begin_inset Formula 
+\begin{equation}
+\theta=T\left(p_{0}/p\right)^{R/c_{p}}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $T$
+\end_inset
+
+ is the temperature,
+ 
+\begin_inset Formula $p_{0}=1000\text{ hPa}$
+\end_inset
+
+,
+ 
+\begin_inset Formula $R$
+\end_inset
+
+ is the specific gas constant of dry air and 
+\begin_inset Formula $c_{p}$
+\end_inset
+
+ is the specific heat capacity at constant pressure.
+ It is the temperature that an air parcel would reach (meteorologists love air parcels),
+ if it were brought adiabatically to 1000
+\begin_inset space ~
+\end_inset
+
+hPa.
+ That is,
+ a small volume of air in the upper atmosphere is brought down to near the ground,
+ while contracting as the pressure increases,
+ without any other exchanges of energy between the air parcel and its surroundings,
+ so it heats up as it descends,
+ but its potential temperature,
+ 
+\begin_inset Formula $\theta$
+\end_inset
+
+,
+ remains the same.
+ One of the wonderful aspects of potential temperature is that its transport equation (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:theta"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+),
+ unlike that of temperature,
+ does not contain a pressure work term,
+ that describes how temperature changes when the air expands or contracts,
+ which can make the equations more difficult to solve.
+ Another joy of potential temperature is that it informative about the stability of the atmosphere.
+ Temperature always decreases with height in the troposphere (below the stratosphere).
+ But potential temperature usually increases or is constant.
+ If potential temperature is ever found to decrease with height then the atmosphere will be unstable,
+ updraughts will form,
+ which can lead to clouds and precipitation.
+\end_layout
+
+\begin_layout Standard
+There is an additional unknown in the primitive equation set (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:mom"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+-
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:theta"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+),
+ the pressure,
+ 
+\begin_inset Formula $p$
+\end_inset
+
+.
+ Unlike the dependent variables (
+\begin_inset Formula $\mathbf{u}$
+\end_inset
+
+,
+ 
+\begin_inset Formula $\rho$
+\end_inset
+
+ and 
+\begin_inset Formula $\theta$
+\end_inset
+
+),
+ this cannot evolve independently.
+ It is tied to density and temperature by an equation of state,
+ such as the ideal gas law
+\begin_inset Formula 
+\begin{equation}
+p=\rho RT.
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The equations that Richardson solved were more complex;
+ he included an equation for total water content,
+ he included turbulent (eddy) viscosity,
+ he wrote the equations in component form in spherical coordinates (in terms of latitude and longitude),
+ he included a source term for the 
+\begin_inset Formula $\theta$
+\end_inset
+
+ equation due to solar radiation and longwave cooling,
+ he included complex surface processes,
+ including things like evaporation from foliage,
+ and he made the excellent hydrostatic assumption
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial p}{\partial z}=-\rho g
+\end{equation}
+
+\end_inset
+
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\nospellcheck off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+where 
+\begin_inset Formula $z$
+\end_inset
+
+ is the local vertical direction and 
+\begin_inset Formula $g$
+\end_inset
+
+ is the magnitude of the acceleration due to gravity
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\nospellcheck default
+\bar default
+\strikeout default
+\xout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+.
+ This can be used,
+ with the continuity equation (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:cont"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) to eliminate the vertical velocity,
+ 
+\begin_inset Formula $w$
+\end_inset
+
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\nospellcheck off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+.
+ 
+\end_layout
+
+\begin_layout Standard
+Richardson was optimistic because he classified weather prediction as a 
+\begin_inset Quotes eld
+\end_inset
+
+marching
+\begin_inset Quotes erd
+\end_inset
+
+ problem (or hyperbolic),
+ with information propagating from the initial conditions and from the boundaries,
+ as opposed to a 
+\begin_inset Quotes eld
+\end_inset
+
+jury
+\begin_inset Quotes erd
+\end_inset
+
+ problem,
+ in which 
+\begin_inset Quotes eld
+\end_inset
+
+jurymen
+\begin_inset Quotes erd
+\end_inset
+
+ sitting at the boundary must all agree simultaneously on then solution (elliptic).
+ This classification was correct,
+ but the information propagates so quickly,
+ in the form of gravity waves,
+ that we need to use numerical methods for solving elliptic problems (including simultaneous solutions in different locations) for solving the primitive equations.
+\end_layout
+
+\begin_layout Standard
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\nospellcheck off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+\begin_inset CommandInset citation
+LatexCommand citet
+key "Rich22"
+literal "false"
+
+\end_inset
+
+ used centered finite differences,
+ knowing them to give second-order accuracy (error are proportional to the square of the grid spacing,
+ so as resolution increases,
+ errors drop quadratically).
+ He used a leapfrog method in time,
+ which he described as 
+\begin_inset Quotes eld
+\end_inset
+
+step-over
+\begin_inset Quotes erd
+\end_inset
+
+.
+ To illustrate this method,
+ we can consider the solution of the 
+\begin_inset Formula $\theta$
+\end_inset
+
+ equation in just one spatial dimension,
+ 
+\begin_inset Formula $x$
+\end_inset
+
+,
+ which is the one-dimensional linear-advection equation:
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\theta}{\partial t}+u\frac{\partial\theta}{\partial x}=0.\label{eq:linAdvect1}
+\end{equation}
+
+\end_inset
+
+If we store values of 
+\begin_inset Formula $\theta$
+\end_inset
+
+ on a grid in an array,
+ indexed by 
+\begin_inset Formula $j$
+\end_inset
+
+,
+ then 
+\begin_inset Formula $\theta_{j}$
+\end_inset
+
+ is 
+\begin_inset Formula $\theta$
+\end_inset
+
+ at position 
+\begin_inset Formula $j\Delta x$
+\end_inset
+
+ where 
+\begin_inset Formula $\Delta x$
+\end_inset
+
+ is the grid spacing.
+ Then we can make the second-order,
+ centered approximation
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\theta}{\partial x}\bigg|_{j}=\frac{\theta_{j+1}-\theta_{j-1}}{2\Delta x}.\label{eq:CS}
+\end{equation}
+
+\end_inset
+
+We also define 
+\begin_inset Formula $\theta^{(n)}$
+\end_inset
+
+ to be 
+\begin_inset Formula $\theta$
+\end_inset
+
+ at time level 
+\begin_inset Formula $n$
+\end_inset
+
+ which is at time 
+\begin_inset Formula $n\Delta t$
+\end_inset
+
+,
+ where 
+\begin_inset Formula $\Delta t$
+\end_inset
+
+ is the time step.
+ We can make a similar centered approximation for the rate of change:
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\theta}{\partial t}\bigg|^{(n)}=\frac{\theta^{(n+1)}-\theta^{(n-1)}}{2\Delta t}.\label{eq:CT}
+\end{equation}
+
+\end_inset
+
+Equations (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:CS"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) and (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:CT"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) can be substituted into (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:linAdvect1"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) to give an equation for the next time level based on old values:
+\begin_inset Formula 
+\begin{equation}
+\theta_{j}^{(n+1)}=\theta_{j}^{(n-1)}-\frac{u\Delta t}{\Delta x}\left(\theta_{j+1}^{(n)}-\theta_{j-1}^{(n)}\right).\label{eq:CTCSadvect}
+\end{equation}
+
+\end_inset
+
+This is the explicit,
+ centered in time,
+ centered in space advection scheme (explicit meaning that the solution at the next time level is found from existing solutions).
+ 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "Rich22"
+literal "false"
+
+\end_inset
+
+ described a few alternatives for what to do at the very first time step,
+ when you do not know values from two previous time levels,
+ only one.
+ This cost effective scheme is not used much as it generates solutions with oscillations.
+ This is worth trying ...
+\end_layout
+
+\begin_layout Subsection
+Exercise:
+ Numerical Solution of the Linear Advection Equation
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Ex_CTCSadvection"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Solve the linear advection equation (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:linAdvect1"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) using the centered in time,
+ centered in space scheme (CTCS,
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:CTCSadvect"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+).
+ Use a periodic domain 
+\begin_inset Formula $x\in[0,1)$
+\end_inset
+
+ of 40 points.
+ Test the code using the initial conditions
+\begin_inset Formula 
+\begin{equation}
+\theta\left(x,0\right)=\begin{cases}
+\frac{1}{2}\left(1-\cos\frac{2\pi\left(x-0.1\right)}{0.3}\right) & \text{for }x\in\left[0.1,0.4\right]\\
+1 & \text{for }x\in\left[0.7,0.9\right]\\
+0 & \text{otherwise}
+\end{cases}
+\end{equation}
+
+\end_inset
+
+The Courant number is
+\begin_inset Formula 
+\begin{equation}
+c=\frac{u\Delta t}{\Delta x}.\label{eq:Courant}
+\end{equation}
+
+\end_inset
+
+Set the Courant number to be 0.4 and run for 10 time steps.
+ You can compare with the analytic solution
+\begin_inset Formula 
+\begin{equation}
+\theta\left(x,t\right)=\theta\left(x-ut,0\right).
+\end{equation}
+
+\end_inset
+
+Can you animate the solution?
+ What can you say about the part of the solution that started from the smooth initial conditions?
+ What do the discontinuities do to the solution?
+ Why?
+\end_layout
+
+\begin_layout Standard
+Next try setting the Courant number to be 1.1 and animate the solution for 5 time steps.
+ What is happening now?
+ Why?
+\end_layout
+
+\begin_layout Subsection
+Insights Enabling Numerical Weather Prediction
+\end_layout
+
+\begin_layout Standard
+Jule 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "Char48"
+literal "false"
+
+\end_inset
+
+ explained why Richardson's forecast produced such wild results and,
+ in doing so,
+ was able to find the right simplification of the equations to make them tractable by numerical solution,
+ with smooth solutions.
+ Charney pointed out that aerodynamics had become tractable,
+ in part by assuming that the air is close to incompressible,
+ so the continuity equation (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:cont"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) is simplified:
+\begin_inset Formula 
+\begin{equation}
+\nabla\cdot\mathbf{u}=0\implies\frac{D\rho}{Dt}=0.\label{eq:ico}
+\end{equation}
+
+\end_inset
+
+This simplification is not useful for weather prediction because density varies by orders of magnitude between the surface and the stratosphere.
+ The primitive equations (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:mom"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+-
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:theta"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) include the representation of acoustic (sound) waves and gravity waves.
+ Deep gravity waves,
+ in which large regions of the atmosphere move up and down under the influence of gravity (like waves on the surface of the ocean) can propagate horizontally at similar speed to acoustic waves.
+ If a numerical model for equations that represent these waves is explicit (solutions for the next time level are found from previous solutions) and if gradients are approximated using nearby grid point values,
+ then time steps must be small to avoid unstable oscillations.
+ To explore this,
+ attempt the exercises in section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:solveSW"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsubsection
+Example:
+ Numerical Solution of Gravity Waves
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:solveSW"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The primitive equations can be simplified and averaged in the vertical to produce the shallow-water equations:
+\begin_inset Formula 
+\begin{align}
+\frac{D\mathbf{u}}{Dt}+2\bm{\Omega}\times\mathbf{u} & =-g\nabla h\label{eq:SWu_vec}\\
+\frac{Dh}{Dt} & =-h\nabla\cdot\mathbf{u}\label{eq:SWh_vec}
+\end{align}
+
+\end_inset
+
+where the velocity,
+ 
+\begin_inset Formula $\mathbf{u}$
+\end_inset
+
+,
+ is only non-zero in the locally horizontal direction,
+ ie perpendicular to 
+\begin_inset Formula $\mathbf{g}$
+\end_inset
+
+.
+ These equations work in this Cartesian form on the surface of the earth,
+ with 
+\begin_inset Formula $g=|\mathbf{g}|$
+\end_inset
+
+,
+ with 
+\begin_inset Formula $\mathbf{g}$
+\end_inset
+
+ perpendicular to the local surface whereas 
+\begin_inset Formula $\bm{\Omega}=\mathbf{k}\Omega$
+\end_inset
+
+ where 
+\begin_inset Formula $\mathbf{k}$
+\end_inset
+
+ points up through the North pole.
+ If we consider a local tangent plane to the sphere,
+ then the shallow water equations can be written
+\begin_inset Formula 
+\begin{align}
+\frac{Du}{Dt}-fv & =-g\frac{\partial h}{\partial x}\label{eq:SWu}\\
+\frac{Dv}{Dt}+fu & =-g\frac{\partial h}{\partial y}\label{eq:SWv}\\
+\frac{Dh}{Dt} & =-h\left(\frac{\partial u}{\partial y}+\frac{\partial v}{\partial y}\right)\label{eq:SWh}
+\end{align}
+
+\end_inset
+
+where 
+\begin_inset Formula $\left(u,v\right)$
+\end_inset
+
+ are the velocity components in the 
+\begin_inset Formula $\left(x,y\right)$
+\end_inset
+
+ directions and the Coriolis parameter,
+ 
+\begin_inset Formula $f=2\Omega\sin\phi$
+\end_inset
+
+ where 
+\begin_inset Formula $\phi$
+\end_inset
+
+ is the latitude.
+ In order to represent only gravity waves,
+ these equations are linearised by replacing 
+\begin_inset Formula $h$
+\end_inset
+
+ with 
+\begin_inset Formula $H+h$
+\end_inset
+
+ where 
+\begin_inset Formula $H$
+\end_inset
+
+ is uniform in space and time and 
+\begin_inset Formula $u,v,h$
+\end_inset
+
+ are assumed small.
+ Just considering one spatial dimension and ignoring rotation (
+\begin_inset Formula $f=0$
+\end_inset
+
+) gives a one-dimensional wave equation
+\begin_inset Formula 
+\begin{align}
+\frac{\partial u}{\partial t} & =-g\frac{\partial h}{\partial x}\label{eq:linSWu}\\
+\frac{\partial h}{\partial t} & =-H\frac{\partial u}{\partial x}\label{eq:linSWh}
+\end{align}
+
+\end_inset
+
+which has gravity wave speed 
+\begin_inset Formula $\sqrt{gH}$
+\end_inset
+
+.
+ If the mean fluid depth,
+ 
+\begin_inset Formula $H$
+\end_inset
+
+,
+ is,
+ for example,
+ the height of the troposphere,
+ around 10
+\begin_inset space ~
+\end_inset
+
+km,
+ and 
+\begin_inset Formula $g\sim10\text{ m/s}$
+\end_inset
+
+ then the gravity wave speed is 316
+\begin_inset space ~
+\end_inset
+
+m/s,
+ close to the speed of sound which is around 343
+\begin_inset space ~
+\end_inset
+
+m/s.
+ The linearised shallow water equations can be solved explicitly using finite differences on a staggered grid,
+ with 
+\begin_inset Formula $u$
+\end_inset
+
+ and 
+\begin_inset Formula $h$
+\end_inset
+
+ stored at alternating locations 
+\begin_inset CommandInset citation
+LatexCommand citep
+before "an excellent choice made by"
+key "Rich22"
+literal "false"
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align}
+\frac{h_{j}^{(n+1)}-h_{j}^{(n)}}{\Delta t} & =-H\frac{u_{j+1/2}^{(n)}-u_{j-1/2}^{(n)}}{\Delta x}\label{eq:linSWh_FB_C}\\
+\frac{u_{j+1/2}^{(n+1)}-u_{j+1/2}^{(n)}}{\Delta t} & =-g\frac{h_{j+1}^{(n+1)}-h_{j}^{(n+1)}}{\Delta x}\label{eq:linSWu_FB_C}
+\end{align}
+
+\end_inset
+
+where 
+\begin_inset Formula $\Delta t$
+\end_inset
+
+ is the time step and 
+\begin_inset Formula $n$
+\end_inset
+
+ is the time level number so that 
+\begin_inset Formula $t=n\Delta t$
+\end_inset
+
+ is the time.
+ The values of 
+\begin_inset Formula $u$
+\end_inset
+
+ and 
+\begin_inset Formula $h$
+\end_inset
+
+ are stored in arrays indexed by an integer 
+\begin_inset Formula $j$
+\end_inset
+
+.
+ The array for 
+\begin_inset Formula $h$
+\end_inset
+
+ at index 
+\begin_inset Formula $j$
+\end_inset
+
+ represents 
+\begin_inset Formula $h$
+\end_inset
+
+ at location 
+\begin_inset Formula $j\Delta x$
+\end_inset
+
+,
+ where 
+\begin_inset Formula $\Delta x$
+\end_inset
+
+ is the grid spacing.
+ However the array for 
+\begin_inset Formula $u$
+\end_inset
+
+ at grid point 
+\begin_inset Formula $j$
+\end_inset
+
+ will actually represent 
+\begin_inset Formula $u$
+\end_inset
+
+ at location 
+\begin_inset Formula $\left(j+1/2\right)\Delta x$
+\end_inset
+
+.
+ Eqn (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:linSWh_FB_C"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) can be rearranged to give 
+\begin_inset Formula $h_{j}^{(n+1)}$
+\end_inset
+
+ at every grid point using a forward difference in time (the time derivative at time 
+\begin_inset Formula $n$
+\end_inset
+
+ is approximated using time 
+\begin_inset Formula $n$
+\end_inset
+
+ and the forward time,
+ 
+\begin_inset Formula $n+1$
+\end_inset
+
+).
+ Once we know 
+\begin_inset Formula $h_{j}^{(n+1)}$
+\end_inset
+
+,
+ this is used to update each 
+\begin_inset Formula $u_{j+1/2}^{(n+1)}$
+\end_inset
+
+ using an explicit backward time difference.
+ The resulting explicit time stepping scheme is called forward-backwards 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Mes77"
+literal "false"
+
+\end_inset
+
+ and it is stable provided the Courant number associated with gravity waves,
+ 
+\begin_inset Formula $c=\sqrt{gH}\Delta t/\Delta x\le1$
+\end_inset
+
+.
+ 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "Rich22"
+literal "false"
+
+\end_inset
+
+ used 
+\begin_inset Formula $\Delta t=6\text{ hours}$
+\end_inset
+
+ and 
+\begin_inset Formula $\Delta x=200\text{ km}$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Subsubsection*
+Exercises
+\end_layout
+
+\begin_layout Enumerate
+Work out the gravity wave Courant number of Richardson's simulation,
+ assuming a height of 10
+\begin_inset space ~
+\end_inset
+
+km.
+ 
+\end_layout
+
+\begin_layout Enumerate
+Work out what time step Richardson would have needed to treat gravity waves stably.
+\end_layout
+
+\begin_layout Enumerate
+Write code to solve the one-dimensional linearised shallow-water equations using the forward-backward time-stepping on a staggered grid (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:linSWh_FB_C"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+,
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:linSWu_FB_C"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) in the periodic domain 
+\begin_inset Formula $x\in[0,L)$
+\end_inset
+
+ using the setup:
+\begin_inset Formula 
+\[
+\begin{array}{c}
+\Delta x=2\times10^{5}\text{ m},\ g=10\text{ m/s},\ L=8\times10^{6}\text{ m},\ H=10\times10^{3}\text{ m}\\
+\begin{array}{cc}
+u\left(x,t=0\right),\  & h\left(x,t=0\right)=\begin{cases}
+\frac{1}{2}\left(1-\cos\frac{6\pi\left(x-L/3\right)}{L}\right) & \text{for }x\in\left[L/3,\ 2L/3\right]\\
+0 & \text{otherwise}
+\end{cases}\end{array}
+\end{array}
+\]
+
+\end_inset
+
+Animate the results for 5 time steps using Richardson's time step of 6
+\begin_inset space ~
+\end_inset
+
+hours.
+ Compare with a stable time step running for the same total duration (so you will need many more,
+ much smaller time steps).
+\end_layout
+
+\begin_layout Enumerate
+The analytic solution returns to the initial conditions after one complete revolution of the periodic domain.
+ Run your model for exactly one revolution by choosing a time step so that the number of time steps is twice the number of points in space.
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+Once you have a simulation that returns approximately to the initial conditions,
+ you can calculate the normalised root mean square error of 
+\begin_inset Formula $h$
+\end_inset
+
+ (the 
+\begin_inset Formula $\ell_{2}$
+\end_inset
+
+ error norm):
+\begin_inset Formula 
+\begin{equation}
+\ell_{2}=\sqrt{\sum_{j=0}^{n_{x}-1}\frac{\left(h_{j}-h\left(x_{j}\right)\right)^{2}}{\left(h\left(x_{j}\right)\right)^{2}}}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $h_{j}$
+\end_inset
+
+ is the numerical solution and 
+\begin_inset Formula $h\left(x_{j}\right)$
+\end_inset
+
+ is the analytic solution at 
+\begin_inset Formula $x_{j}$
+\end_inset
+
+.
+ For this setup,
+ you should get at 
+\begin_inset Formula $\ell_{2}$
+\end_inset
+
+ error norm of around 0.04.
+\end_layout
+
+\begin_layout Enumerate
+Double the number of grid points and time steps (so that the Courant number stays the same).
+ Repeat the simulation,
+ with the solution returning to the initial conditions.
+ Recalculate the 
+\begin_inset Formula $\ell_{2}$
+\end_inset
+
+ error norm.
+ This is a second-order method so 
+\begin_inset Formula $\ell_{2}$
+\end_inset
+
+ should reduce by a factor of 4.
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+Write code to solve the shallow-water equations a co-located method (without grid-staggering),
+ with 
+\begin_inset Formula $h_{j}$
+\end_inset
+
+ and 
+\begin_inset Formula $u_{j}$
+\end_inset
+
+ stored at the same locations:
+\begin_inset Formula 
+\begin{align}
+\frac{h_{j}^{(n+1)}-h_{j}^{(n)}}{\Delta t} & =-H\frac{u_{j+1}^{(n)}-u_{j-1}^{(n)}}{2\Delta x}\label{eq:linSWh_FB_A}\\
+\frac{u_{j}^{(n+1)}-u_{j}^{(n)}}{\Delta t} & =-g\frac{h_{j+1}^{(n+1)}-h_{j-1}^{(n+1)}}{2\Delta x}\label{eq:linSWu_FB_A}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+Run this code with the same parameters as the staggered grid code.
+ You should find:
+\end_layout
+
+\begin_layout Enumerate
+The errors are a factor of 4 larger than when using a staggered grid.
+\end_layout
+
+\begin_layout Enumerate
+You can use a time step twice as big as the staggered grid and still get stable results.
+\end_layout
+
+\begin_layout Enumerate
+If you initialise the height with a grid-scale oscillation:
+\begin_inset Formula 
+\begin{equation}
+h\left(x_{j},t=0\right)=\begin{cases}
+1 & \text{for }j\text{ even}\\
+-1 & \text{otherwise}
+\end{cases}
+\end{equation}
+
+\end_inset
+
+you should find a spurious stable solution.
+ This is a computational mode – a solution with artefacts that do not go away as the resolution is increased.
+\end_layout
+
+\begin_layout Enumerate
+Re-run the staggered grid code with the initial conditions consisting of a grid-scale oscillations.
+ Does this solution seem to more accurate?
+ What solution would you expect?
+\end_layout
+
+\end_deeper
+\begin_layout Subsubsection
+Solving Elliptic Equations
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:ellipticSolutions"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The primitive equations (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:mom"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+-
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:theta"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+),
+ the linear advection equations (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:linAdvect1"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) and the shallow-water equations (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:SWu_vec"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+-
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:SWh_vec"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) are hyperbolic,
+ meaning that information propagates at a finite speed.
+ This encouraged Richardson in developing an explicit time-stepping method.
+ However,
+ the propagation speeds are so fast that we actually need a numerical method similar to a numerical method for solving an elliptic equations.
+ By making the incompressible approximation (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:ico"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) for the primitive equations,
+ acoustic waves have infinite speed,
+ making the problem elliptic.
+ The incompressible approximation for the shallow-water equations can also be used to derive the barotropic vorticity equation.
+ This is an equation for the vertical component of the total vorticity,
+ 
+\begin_inset Formula $\eta$
+\end_inset
+
+,
+ which includes the vertical component of the relative vorticity,
+ 
+\begin_inset Formula $\xi=\left(\nabla\times\mathbf{u}\right)\cdot\mathbf{k}$
+\end_inset
+
+,
+ and planetary rotation (the Coriolis parameter,
+ 
+\begin_inset Formula $f$
+\end_inset
+
+):
+\begin_inset Formula 
+\begin{equation}
+\eta=\xi+f\label{eq:pv}
+\end{equation}
+
+\end_inset
+
+Taking the curl of the momentum,
+ applying some vector-calculus identities and assuming incompressiblity gives the barotropic voriticity equation,
+\begin_inset Formula 
+\begin{equation}
+\frac{D\eta}{Dt}=0\label{eq:baroVortEqn}
+\end{equation}
+
+\end_inset
+
+(see the mathematical exercises below).
+ This seems wonderfully simple!
+ The difficult bit comes is calculating the velocity from the vorticity by inverting (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:pv"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) which is exactly the kind of 
+\begin_inset Quotes eld
+\end_inset
+
+jurymen
+\begin_inset Quotes erd
+\end_inset
+
+ problem that Richardson wanted to avoid.
+ 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "Char48"
+literal "false"
+
+\end_inset
+
+ realised that some such elliptic solution was essential for avoiding severe time-step restrictions.
+ 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "Char49"
+literal "false"
+
+\end_inset
+
+ knew that weather forecasters relied mostly on charts of pressure to predict the weather.
+ It should not be necessary to solve the full primitive equations,
+ whose initialisation relies on accurate knowledge of winds,
+ density and temperature.
+ The wind is close to geostrophic balance
+\begin_inset Formula 
+\begin{equation}
+\begin{array}{cccc}
+u\approx-\frac{1}{\rho f}\frac{\partial p}{\partial y},\ \  & v\approx\frac{1}{\rho f}\frac{\partial p}{\partial x},\ \  & w\approx0 & \text{ or }\mathbf{u}=\mathbf{k}\times\frac{\nabla p}{\rho f}\end{array}\label{eq:geoBalance}
+\end{equation}
+
+\end_inset
+
+so wind can be determined from the pressure (flowing anti-clockwise,
+ or cyclonically,
+ around low pressure in the Northern hemisphere).
+ The winds advect (move) the pressure,
+ making it evolve slowly,
+ making the weather predictable.
+ However geostrophic balance cannot be used to predict the weather.
+ Geostrophic balance (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:geoBalance"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) implies incompressibility and,
+ substituting (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:geoBalance"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) into the momentum equation (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:mom"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) results in the wind and other variables never changing.
+ This is a persistence forecast - the weather tomorrow will be the same as today.
+ We don't need equations to make a persistence forecast.
+ So it seems that we need need some way to ignore the 
+\begin_inset Quotes eld
+\end_inset
+
+entirely irrelevant gravity motions
+\begin_inset Quotes erd
+\end_inset
+
+.
+ 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "CFvN50"
+literal "true"
+
+\end_inset
+
+ made the first numerical weather predictions by finding a pressure level in the atmosphere,
+ 
+\begin_inset Formula $p^{*}$
+\end_inset
+
+,
+ where horizontal divergence is smallest.
+ The equations are then formulated on this pressure surface,
+ which has geopotential height,
+ 
+\begin_inset Formula $z$
+\end_inset
+
+.
+ 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "CFvN50"
+literal "true"
+
+\end_inset
+
+ used 
+\begin_inset Formula $p^{*}=500\text{ hPa}$
+\end_inset
+
+ and,
+ to this day,
+ much weather data is reported on the 
+\begin_inset Formula $500\text{ hPa}$
+\end_inset
+
+ surface and ECMWF use the height of the 
+\begin_inset Formula $500\text{ hPa}$
+\end_inset
+
+ surface,
+ 
+\begin_inset Formula $z_{500}$
+\end_inset
+
+,
+ to verify their forecasts.
+ Geostrophically balanced winds can be written in terms of 
+\begin_inset Formula $z$
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\mathbf{v}=-\frac{g}{f}\mathbf{k}\times\nabla z\label{eq:geoBalanceZ}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+ is the horizontal component of the wind.
+ Hence the two equations to be solved,
+ for total vorticity,
+ 
+\begin_inset Formula $\eta$
+\end_inset
+
+,
+ and geopotential height,
+ 
+\begin_inset Formula $z$
+\end_inset
+
+,
+ for the simplest weather prediction are
+\begin_inset Formula 
+\begin{align}
+\frac{D\eta}{Dt} & =0, & g\nabla\cdot\frac{1}{f}\nabla z & =\xi.\label{eq:baroVortGeoVort}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection*
+Mathematical Exercises
+\end_layout
+
+\begin_layout Enumerate
+From the barotropic vorticity equation (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:baroVortEqn"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+),
+ derive the equation for the relative vorticity,
+ 
+\begin_inset Formula $\xi$
+\end_inset
+
+ on a 
+\begin_inset Formula $\beta$
+\end_inset
+
+ plane
+\begin_inset Formula 
+\begin{equation}
+\frac{D\xi}{Dt}+\beta v=0
+\end{equation}
+
+\end_inset
+
+where we assume that Coriolis varies linearly in the 
+\begin_inset Formula $y$
+\end_inset
+
+ direction
+\begin_inset Formula 
+\begin{equation}
+f=f_{0}+\beta y
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $f_{0}$
+\end_inset
+
+ is a constant.
+\end_layout
+
+\begin_layout Enumerate
+Eqn (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:geoBalance"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) gives geostrophic balance in terms of pressure,
+ 
+\begin_inset Formula $p$
+\end_inset
+
+,
+ and (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:geoBalanceZ"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) gives geostrophic balance in terms of geostrophic height,
+ 
+\begin_inset Formula $z$
+\end_inset
+
+.
+ Use hydrostatic balance and the chain rule on a surface,
+ 
+\begin_inset Formula $S$
+\end_inset
+
+,
+ where pressure is uniform
+\begin_inset Formula 
+\begin{align*}
+\frac{\partial p}{\partial x}\bigg|_{S} & =\frac{\partial p}{\partial x}\bigg|_{z}+\frac{\partial p}{\partial z}\bigg|_{x}\frac{\partial z}{\partial x}\bigg|_{S}\left(=0\right) & \frac{\partial p}{\partial z} & =-\rho g
+\end{align*}
+
+\end_inset
+
+ to derive (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:geoBalanceZ"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) from (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:geoBalance"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Enumerate
+Use geostrophic balance to derive the second equation in (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:baroVortGeoVort"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+)
+\begin_inset Formula 
+\begin{equation}
+g\nabla\cdot\frac{1}{f}\nabla z=\xi.
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Derive the barotropic vorticity equation (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:baroVortEqn"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) for two-dimensional flow,
+ 
+\begin_inset Formula $\mathbf{u}=\left(u,v,0\right)^{T}$
+\end_inset
+
+,
+ by taking the curl of (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:SWu_vec"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+),
+ assuming incompressibilty (
+\begin_inset Formula $\nabla\cdot\mathbf{u}=\frac{\partial u}{\partial y}+\frac{\partial v}{\partial y}=0$
+\end_inset
+
+),
+ uniform 
+\begin_inset Formula $h$
+\end_inset
+
+ and using the vector calculus identities:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Formula $\mathbf{u}\cdot\nabla\mathbf{u}=\left(\nabla\times\mathbf{u}\right)\times\mathbf{u}+\nabla\frac{|\mathbf{u}|^{2}}{2}$
+\end_inset
+
+ for any vector,
+ 
+\begin_inset Formula $\mathbf{u}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\nabla\times\left(\nabla K\right)=0$
+\end_inset
+
+ for any scalar,
+ 
+\begin_inset Formula $K$
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Subsubsection*
+Coding Exercise
+\end_layout
+
+\begin_layout Standard
+Invert vorticity to find geopotential height,
+ 
+\begin_inset Formula $z$
+\end_inset
+
+ using a finite difference scheme in 1D.
+ Check your answer by calculating vorticity from 
+\begin_inset Formula $z$
+\end_inset
+
+.
+ Boundary conditions and initial vorticity ...
+\end_layout
+
+\begin_layout Subsubsection
+Elliptic Solutions of Hyperbolic Equations – the semi-implicit method
+\end_layout
+
+\begin_layout Standard
+Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:ellipticSolutions"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+ described approximations of the hyperbolic primitive equations (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:mom"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+-
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:theta"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) by the elliptic vorticity equation (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:baroVortEqn"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+).
+ The real atmosphere is,
+ of course fully compressible,
+ with finite speed acoustic and gravity waves and non-hydrostatic motions,
+ so for the most accurate weather forecasts,
+ all of these process need to be included,
+ but without the time step being limited by the speed of the fastest waves.
+ This is where semi-implicit time stepping comes in.
+ The full equations are written as linearised equations that can be solved implicitly,
+ and the non-linear and other slow parts are solved explicitly.
+ Rather than describing semi-implicit time stepping for the primitive equations,
+ we can consider the shallow-water equations (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:SWu_vec"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+-
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:SWh_vec"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) and treat the fast,
+ gravity waves implicitly and the advection and Coriolis terms explicitly.
+ This description will be for a time-stepping scheme that is first-order accurate in time,
+ but the same method can used with schemes that are higher-order accurate in time.
+ Discretising in time only:
+\begin_inset Formula 
+\begin{equation}
+\frac{DX}{DT}=\frac{\partial X}{\partial t}+\mathbf{u}\mathbf{\cdot}\nabla X\approx\frac{X^{(n+1)}-X^{(n)}}{\Delta t}+\mathbf{u}\mathbf{\cdot}\nabla X^{(n)}
+\end{equation}
+
+\end_inset
+
+for some dependent variable 
+\begin_inset Formula $X$
+\end_inset
+
+,
+ where the advection term,
+ 
+\begin_inset Formula $\mathbf{u}\mathbf{\cdot}\nabla X$
+\end_inset
+
+ is considered slow and so is treated explicitly,
+ so the value at the old time level is used.
+ So (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:SWu_vec"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+-
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:SWh_vec"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) become
+\begin_inset Formula 
+\begin{align}
+\frac{\mathbf{u}^{(n+1)}-\mathbf{u}^{(n)}}{\Delta t}+\mathbf{u}^{(n)}\mathbf{\cdot}\nabla\mathbf{u}^{(n)}+2\bm{\Omega}\times\mathbf{u}^{(n)} & =-g\nabla h^{(n+1)}\label{eq:uSI}\\
+\frac{h^{(n+1)}-h^{(n)}}{\Delta t}+\mathbf{u}^{(n)}\mathbf{\cdot}\nabla h^{(n)} & =-h^{(n)}\nabla\cdot\mathbf{u}^{(n+1)}\label{eq:hSI}
+\end{align}
+
+\end_inset
+
+with the terms involved in gravity-wave propagation (in the linearised equations 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:linSWu"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+,
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:linSWh"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) treated implicitly,
+ using the new time level.
+ Variables 
+\begin_inset Formula $\mathbf{u}$
+\end_inset
+
+ and 
+\begin_inset Formula $h$
+\end_inset
+
+ both consist of arrays of values over a grid,
+ and 
+\begin_inset Formula $h^{(n+1)}$
+\end_inset
+
+ is needed to update 
+\begin_inset Formula $\mathbf{u}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{u}^{(n+1)}$
+\end_inset
+
+ is needed to update 
+\begin_inset Formula $h$
+\end_inset
+
+.
+ To proceed,
+ we split 
+\begin_inset Formula $\mathbf{u}^{(n+1)}$
+\end_inset
+
+ from (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:uSI"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) into its explicit and implicit parts and substitute this into (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:hSI"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+):
+\begin_inset Formula 
+\begin{align}
+\mathbf{u}^{(n+1)} & =\mathbf{u}^{\prime}-\Delta tg\nabla h^{(n+1)}\label{eq:backS}\\
+\text{where }\mathbf{u}^{\prime} & =\mathbf{u}^{(n)}-\Delta t\left\{ \mathbf{u}^{(n)}\mathbf{\cdot}\nabla\mathbf{u}^{(n)}+2\bm{\Omega}\times\mathbf{u}^{(n)}\right\} \label{eq:uPrimeEqn}\\
+\implies\frac{h^{(n+1)}-h^{(n)}}{\Delta t} & -\Delta tgh^{(n)}\nabla^{2}h^{(n+1)}=-\mathbf{u}^{(n)}\mathbf{\cdot}\nabla h^{(n)}-h^{(n)}\nabla\cdot\mathbf{u}^{\prime}.\label{eq:hEqn}
+\end{align}
+
+\end_inset
+
+The first step is to calculate 
+\begin_inset Formula $\mathbf{u}^{\prime}$
+\end_inset
+
+ explicitly from (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:uPrimeEqn"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+).
+ Eqn (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:hEqn"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) appears to be an elliptic equation for 
+\begin_inset Formula $h$
+\end_inset
+
+ and is sometimes called the pressure equation or a Helmholtz equation.
+ All of the unknown values of 
+\begin_inset Formula $h$
+\end_inset
+
+ can be put into an array.
+ The discretisation of 
+\begin_inset Formula $\nabla^{2}h$
+\end_inset
+
+ can be represented as a matrix multiplied by this array.
+ Then this matrix equation can be solved to find the array of all of the 
+\begin_inset Formula $h$
+\end_inset
+
+ values.
+ The final step is the back-substitution,
+ to calculate 
+\begin_inset Formula $\mathbf{u}^{(n+1)}$
+\end_inset
+
+ from 
+\begin_inset Formula $\mathbf{u}^{\prime}$
+\end_inset
+
+ and the new values of 
+\begin_inset Formula $h^{(n+1)}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsubsection*
+Exercise
+\end_layout
+
+\begin_layout Standard
+We will assume a one-dimensional staggered grid (eqns 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:linSWu"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+,
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:linSWh"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+),
+ without rotation.
+ So the continuous equations are
+\begin_inset Formula 
+\begin{align*}
+\frac{\partial u}{\partial t}+u\frac{\partial u}{\partial x} & =-g\frac{\partial h}{\partial x}\\
+\frac{\partial h}{\partial t}+u\frac{\partial h}{\partial x} & =-h\frac{\partial u}{\partial x}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Write the semi-implicit method,
+ (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:backS"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+-
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:hEqn"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) for this one-dimensional system.
+\end_layout
+
+\begin_layout Enumerate
+We will also assume that 
+\begin_inset Formula $u>0$
+\end_inset
+
+ everywhere,
+ for all time.
+ This allows us to use a stable upwind approximation for the advection terms.
+ So 
+\begin_inset Formula $u^{\prime}$
+\end_inset
+
+ can be calculated as
+\begin_inset Formula 
+\begin{equation}
+u_{j+1/2}^{\prime}=u_{j+1/2}^{(n)}-\Delta t\ u_{j+1/2}^{(n)}\frac{u_{j+1/2}^{(n)}-u_{j-1/2}^{(n)}}{\Delta x}.
+\end{equation}
+
+\end_inset
+
+In exercise 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Ex_CTCSadvection"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+ we used a centered in space approximation for advection,
+ which lead to oscillations in the solution.
+ This upwind approximation,
+ with information for calculating 
+\begin_inset Formula $\partial u/\partial x$
+\end_inset
+
+ coming only from upwind,
+ leads to smooth solutions but it is less accurate.
+ Using the approximation 
+\begin_inset Formula $u_{j}=\frac{1}{2}\left(u_{j-1/2}+u_{j+1/2}\right)$
+\end_inset
+
+,
+ write down the upwind approximation for the term 
+\begin_inset Formula $u\frac{\partial h}{\partial x}$
+\end_inset
+
+ at location 
+\begin_inset Formula $j$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Enumerate
+Using grid-staggering as in (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:linSWh_FB_C"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+),
+ write down the approximation for the term 
+\begin_inset Formula $h\frac{\partial u^{\prime}}{\partial x}$
+\end_inset
+
+ at location 
+\begin_inset Formula $j$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Maybe just use implicit to solve the linearised eqns and compare with previous exercise?
+\end_layout
+
+\begin_layout Section
+A Golden Era of Numerical Weather Prediction
+\end_layout
+
+\begin_layout Standard
+Through the 1950s and 1960s,
+ simulations of the atmosphere became more realistic and the models became more and more similar to those that are used now.
+ 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "Smag58"
+literal "false"
+
+\end_inset
+
+ solved the the primitive equations in three dimensions (with just two vertical levels).
+ But the paper mostly discusses causes of instability and no plots of numerical results are presented,
+ suggesting that there was little realism in the results.
+ 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "Phil59"
+literal "false"
+
+\end_inset
+
+ simulated the entire northern hemisphere with one horizontal layer,
+ with a 24 hour simulation taking 84 minutes.
+ Like 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "Rich22"
+literal "false"
+
+\end_inset
+
+,
+ 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "Phil59"
+literal "false"
+
+\end_inset
+
+ was still blaming grid-scale oscillations on the lack of smoothness in the initial conditions rather than on the numerical methods.
+ 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "Smag63"
+literal "false"
+
+\end_inset
+
+ created a two-layer model between the equator and 64
+\begin_inset script superscript
+
+\begin_layout Plain Layout
+o
+\end_layout
+
+\end_inset
+
+N which he was able to run for 60 days,
+ simulating baroclinic instability,
+ poleward heat transport and a Hadley circulation,
+ with some realism.
+ Grid-scale oscillations were controlled using eddy viscosity to mimic the effects of turbulent diffusion.
+ 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "Smag63"
+literal "false"
+
+\end_inset
+
+ mentioned Arakawa's emerging work on energy conserving methods which would prove revolutionary in atmosphere and ocean modelling.
+\end_layout
+
+\begin_layout Subsection
+Three Dimensional Solutions on Mainframe Computers
+\end_layout
+
+\begin_layout Subsubsection
+Arakawa's Numerics
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset citation
+LatexCommand citet
+key "AL77"
+literal "false"
+
+\end_inset
+
+ described the numerical methods used on the UCLA general circulation model;
+ a landmark in the development of stable and accurate numerical methods for the atmosphere,
+ a 92 page article that is still being cited (3,538 citations in total,
+ with over 100 citations every year since 2014).
+ The model is three dimensional with 12 vertical levels,
+ 
+\begin_inset Formula $72\times45$
+\end_inset
+
+ grid points in the horizontal and a time step of 6 minutes.
+ 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "AL77"
+literal "false"
+
+\end_inset
+
+ is best known for the description of the Arakawa grids - 5 arrangements of prognostic variables on a grid,
+ labelled A-E.
+ They wrote the momentum equation,
+ for the horizontal velocity,
+ 
+\begin_inset Formula $\mathbf{v}$
+\end_inset
+
+,
+ in vector-invariant form
+\begin_inset Formula 
+\begin{equation}
+\frac{D\mathbf{v}}{Dt}+f\mathbf{k}\times\mathbf{v}+\frac{1}{\rho}\nabla_{h}p+\nabla_{h}K=\mathbf{F}_{h}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $K=\frac{1}{2}|\mathbf{v}|^{2}$
+\end_inset
+
+ is the kinetic energy,
+ 
+\begin_inset Formula $\mathbf{F}_{h}$
+\end_inset
+
+ is the horizontal component of the frictional force and 
+\begin_inset Formula $\nabla_{h}$
+\end_inset
+
+ is the horizontal component of the gradient.
+ Use of the vector-invariant form enables exact energy conservation,
+ with losses in gravitiational potential being exactly transferred to kinetic energy,
+ and back.
+ The Arakawa grids A-E are shown in figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Arakawa-A-E"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+.
+ The advantages and dis-advantages of these grids can best be seen in terms of the linearised shallow water equations.
+ The one-dimensional linearised shallow water equations without Coriolis are (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:linSWu"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+,
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:linSWh"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+).
+ The two-dimensioal linearised shallow water equations can be obtained by replacing 
+\begin_inset Formula $D/Dt$
+\end_inset
+
+ with 
+\begin_inset Formula $\partial/\partial t$
+\end_inset
+
+ in (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:SWu"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+-
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:SWh"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) and replacing 
+\begin_inset Formula $h$
+\end_inset
+
+ with the constant,
+ uniform average height,
+ 
+\begin_inset Formula $H$
+\end_inset
+
+,
+ on the right hand side of (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:SWh"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+).
+ As was investigated in example 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:solveSW"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+,
+ if all variables are located together,
+ as in the A-grid,
+ then the pressure (or height) gradients needed to update the velocity are calculated over three grid points,
+ missing the central location (eqn 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:linSWu_FB_A"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) and the divergence needed to update the height in (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:SWh"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) is calculated over three points in each direction,
+ missing the central location (eqn 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:linSWh_FB_A"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+).
+ This omission of the central location means that grid-scale oscillations can develop – oscillations in 
+\begin_inset Formula $h$
+\end_inset
+
+ can be present which do not lead to height gradients,
+ and oscillations in 
+\begin_inset Formula $u$
+\end_inset
+
+ and 
+\begin_inset Formula $v$
+\end_inset
+
+ can be present which do not lead to divergence.
+ These oscillations are spurious computational modes and make the A-grid problematic for atmospheric modelling.
+ Considering the height gradients and the divergence terms of eqns (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:SWu"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+-
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:SWh"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+),
+ the C-grid appears to be ideal – compact height gradients in the 
+\begin_inset Formula $x$
+\end_inset
+
+-direction (using two points without missing out a central point),
+ are centered at the 
+\begin_inset Formula $u$
+\end_inset
+
+ location,
+ compact height gradients in the 
+\begin_inset Formula $y$
+\end_inset
+
+-direction are at the 
+\begin_inset Formula $v$
+\end_inset
+
+ location and the divergence can be calculated at the 
+\begin_inset Formula $h$
+\end_inset
+
+ location without missing any velocities at 
+\begin_inset Formula $h$
+\end_inset
+
+.
+ This means that gravity wave propagation is most accurate and free of computational modes on the C-grid,
+ and this grid was chosen by 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "AL77"
+literal "false"
+
+\end_inset
+
+ for the UCLA model.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+placement document
+alignment document
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Tabular
+<lyxtabular version="3" rows="2" columns="5">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+A
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+B
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+C
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+D
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+E
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset External
+	template XFig
+	filename ArakawaGrids/A.fig
+	width 18text%
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset External
+	template XFig
+	filename ArakawaGrids/B.fig
+	width 18text%
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset External
+	template XFig
+	filename ArakawaGrids/C.fig
+	width 18text%
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset External
+	template XFig
+	filename ArakawaGrids/D.fig
+	width 18text%
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset External
+	template XFig
+	filename ArakawaGrids/E.fig
+	width 18text%
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Arakawa grids A-E on finite volumes,
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Arakawa-A-E"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Gravity waves are not the only phenomena being modelled,
+ and even in the linearised shallow water equations the Coriolis terms need to be represented accurately.
+ If we consider only the rates of change and the Coriolis terms,
+ we get equations for inertial oscillations
+\begin_inset Formula 
+\begin{align}
+\frac{\partial u}{\partial t} & =fv & \frac{\partial v}{\partial t} & =-fu\label{eq:inertialOsc}
+\end{align}
+
+\end_inset
+
+which have solutions with air (or water) going round in circles with radius 
+\begin_inset Formula $\sqrt{u_{o}^{2}+v_{0}^{2}}$
+\end_inset
+
+ and angular frequency 
+\begin_inset Formula $f$
+\end_inset
+
+.
+ In order to model (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:inertialOsc"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) most accurately,
+ 
+\begin_inset Formula $u$
+\end_inset
+
+ and 
+\begin_inset Formula $v$
+\end_inset
+
+ should be at the same locations on the grid,
+ otherwise spatial averaging will be needed.
+ .
+ 
+\begin_inset Formula $u$
+\end_inset
+
+ and 
+\begin_inset Formula $v$
+\end_inset
+
+ are at the same location for grids A,
+ B and E but not C or D.
+ The UK Met Office chose the B-grid for their first unified model of weather and climate.
+ For the C-grid,
+ with 
+\begin_inset Formula $h$
+\end_inset
+
+ stored at grid point 
+\begin_inset Formula $\left(i,j\right)$
+\end_inset
+
+,
+ with 
+\begin_inset Formula $x=i\Delta x$
+\end_inset
+
+ and 
+\begin_inset Formula $y=j\Delta y$
+\end_inset
+
+,
+ 
+\begin_inset Formula $u$
+\end_inset
+
+ will be stored at 
+\begin_inset Formula $\left(i+1/2,j\right)$
+\end_inset
+
+ and updated with averaging for the Coriolis term:
+\begin_inset Formula 
+\begin{align}
+u_{i+1/2,j}^{(n+1)} & =u_{i+1/2,j}^{(n)}\\
+ & +\Delta t\left\{ f\frac{v_{i,j-1/2}+v_{i+1,j-1/2}+v_{i,j+1/2}+v_{i+1,j+1/2}}{4}-g\frac{h_{i+1,j}-h_{i,j}}{\Delta x}\right\} \nonumber 
+\end{align}
+
+\end_inset
+
+This averaging reduces accuracy and enables spurious computational modes at coarse resolution,
+ but the accurate representation of gravity waves has proven to be more important for atmospheric modelling.
+ This may seem counter intuitive,
+ considering that 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "CFvN50"
+literal "true"
+
+\end_inset
+
+ described these waves as 
+\begin_inset Quotes eld
+\end_inset
+
+entirely irrelevant gravity motions
+\begin_inset Quotes erd
+\end_inset
+
+.
+ They are not irrelevant.
+ They are the mechanism by which the flow comes into geostrophic balance – if there is a region of high height and no flow along the boundary of the high height,
+ then gravity waves will be generated,
+ flow will be created and the fluid will move towards geostrophic balance (a process called geostrophic adjustment).
+ If gravity waves are filtered then this process is assumed to happen instantaneously.
+ 
+\end_layout
+
+\begin_layout Standard
+The D-grid may appear ideal for representing fluids that are close to geostrophic balance,
+ since the terms involved in geostrophic balance are the largest in the momentum equation (for example,
+ 
+\begin_inset Formula $v$
+\end_inset
+
+ is in the same place as the most compact calculation of 
+\begin_inset Formula $\partial p/\partial x$
+\end_inset
+
+).
+ However these are both terms in the 
+\begin_inset Formula $u$
+\end_inset
+
+ equation,
+ and 
+\begin_inset Formula $u$
+\end_inset
+
+ is at a different location.
+ The E-grid is the same as the B-grid but rotated by 45
+\begin_inset script superscript
+
+\begin_layout Plain Layout
+o
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsubsection*
+Exercise
+\end_layout
+
+\begin_layout Standard
+Write a C-grid and an A-grid shallow water model?
+\end_layout
+
+\begin_layout Subsection
+The Spectral Method
+\end_layout
+
+\begin_layout Standard
+The European Centre for Medium Range Weather Forecasts (ECMWF) consistently produces the most accurate global weather forecasts,
+ with skill improving at the rate of one day per decade 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "HJV+24"
+literal "false"
+
+\end_inset
+
+.
+ ECMWF specialise in forecasts with lead times of one to two weeks.
+ Skillfull forecasts at these longer lead times was made possible when they switched from finite differences to the spectral method 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "GJ82,SBJ+89"
+literal "false"
+
+\end_inset
+
+ to solve the primitive equations on there sphere.
+ Spectral methods have exponential convergence.
+ This means that they have the highest possible order of accuracy for the number of grid points.
+ This comes at the cost of all to all communication.
+ This sounds like a big problem for massively parallel computers.
+ However,
+ it turns out that ECMWF's spectral model is continuing to scale well.
+ 
+\end_layout
+
+\begin_layout Subsubsection
+The Mathematics of the Spectral Method
+\end_layout
+
+\begin_layout Standard
+This section gives a simple example of a spectral method.
+ 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "Dur11"
+literal "false"
+
+\end_inset
+
+ provides a more general definition.
+\end_layout
+
+\begin_layout Standard
+In order to solve
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\phi}{\partial t}+F\left(\phi\right)=0\label{eq:generalPDE}
+\end{equation}
+
+\end_inset
+
+for some function,
+ 
+\begin_inset Formula $F$
+\end_inset
+
+,
+ we represent 
+\begin_inset Formula $\phi$
+\end_inset
+
+ as a sum of globally defined basis functions.
+ For simplicity,
+ we will consider a one-dimensional periodic domain,
+ with 
+\begin_inset Formula $x\in[-\pi,\pi]$
+\end_inset
+
+,
+ so that 
+\begin_inset Formula $\phi$
+\end_inset
+
+ can be represented as a sum of 
+\begin_inset Formula $2N+1$
+\end_inset
+
+ Fourier modes,
+ 
+\begin_inset Formula $e^{ikx}$
+\end_inset
+
+,
+ with Fourier coefficients,
+ 
+\begin_inset Formula $a_{k}\left(t\right)$
+\end_inset
+
+:
+\begin_inset Formula 
+\begin{equation}
+\phi\left(x,t\right)=\sum_{k=-N}^{N}a_{k}\left(t\right)e^{ikx}.\label{eq:FourierDecomp}
+\end{equation}
+
+\end_inset
+
+The initial Fourier coefficients,
+ 
+\begin_inset Formula $a_{k}\left(t_{0}\right)$
+\end_inset
+
+,
+ can be found using the orthogonality property of the Fourier modes
+\begin_inset Formula 
+\begin{equation}
+\int_{-\pi}^{\pi}e^{ipx}e^{-iqx}dx=\begin{cases}
+2\pi & \text{if }p=q\\
+0 & \text{otherwise.}
+\end{cases}\label{eq:FourierOrthogonal}
+\end{equation}
+
+\end_inset
+
+So if (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:FourierDecomp"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) is multiplied by 
+\begin_inset Formula $e^{-iqx}$
+\end_inset
+
+ and integrated between 
+\begin_inset Formula $-\pi$
+\end_inset
+
+ and 
+\begin_inset Formula $\pi$
+\end_inset
+
+,
+ we get equations for the initial Fourier coefficients from the initial conditions:
+\begin_inset Formula 
+\begin{align}
+a_{k}\left(t_{0}\right) & =\frac{1}{2\pi}\int_{-\pi}^{\pi}\phi\left(x,t_{0}\right)e^{-ikx}dx\label{eq:FourierTransform}
+\end{align}
+
+\end_inset
+
+Eqn (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:FourierTransform"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) is a Fourier transform and computers have fast algorithms called ffts (fast Fourier transforms) for calculating Fourier coefficients from evaluations of a function at regularly spaced intervals.
+ However to find solutions of (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:generalPDE"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+),
+ we need to know how the Fourier coefficients vary in time.
+ We need to find each 
+\begin_inset Formula $a_{k}\left(t\right)$
+\end_inset
+
+ so that when (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:FourierDecomp"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) is substituted into (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:generalPDE"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+),
+ (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:generalPDE"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) is satisfied as closely as possible.
+ For the spectral method 
+\begin_inset Quotes eld
+\end_inset
+
+as closely as possible
+\begin_inset Quotes erd
+\end_inset
+
+ means the Galerkin approximation:
+\begin_inset Formula 
+\begin{equation}
+\int_{-\pi}^{\pi}\left\{ \frac{\partial\phi}{\partial t}+F\left(\phi\right)\right\} e^{-ikx}dx=0\ \forall k\in-N,...,N.\label{eq:spectralGalerkin}
+\end{equation}
+
+\end_inset
+
+Substituting (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:FourierDecomp"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) into (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:spectralGalerkin"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+),
+ using the orthogonality of the Fourier modes and simplifying gives:
+\begin_inset Formula 
+\begin{equation}
+2\pi\frac{da_{k}}{dt}+\int_{-\pi}^{\pi}F\left(\sum_{q=-N}^{N}a_{q}\left(t\right)e^{iqx}\right)e^{-ikx}dx=0.\label{eq:spectralMethod}
+\end{equation}
+
+\end_inset
+
+To make progress in evaluating the second part of the integral in (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:spectralMethod"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+),
+ we need to know 
+\begin_inset Formula $F$
+\end_inset
+
+.
+ We will consider some examples.
+\end_layout
+
+\begin_layout Subsubsection
+Linear Advection using the Spectral Method
+\end_layout
+
+\begin_layout Standard
+Eqn (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:generalPDE"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) becomes the linear advection equation for 
+\begin_inset Formula $F\left(\phi\right)=u\ \partial\phi/\partial x$
+\end_inset
+
+ with a constant,
+ uniform wind speed 
+\begin_inset Formula $u$
+\end_inset
+
+.
+ Then (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:spectralMethod"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) simplifies to
+\begin_inset Formula 
+\begin{equation}
+\frac{da_{k}}{dt}=iua_{k}\label{eq:spectralLinearAdvect}
+\end{equation}
+
+\end_inset
+
+which can be solved either analytically or numerically for each 
+\begin_inset Formula $a_{k}$
+\end_inset
+
+,
+ starting from the initial conditions,
+ 
+\begin_inset Formula $a_{k}\left(t_{0}\right)$
+\end_inset
+
+ from the Fourier transform (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:FourierTransform"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+).
+ 
+\end_layout
+
+\begin_layout Subsubsection
+Non-linear Advection using the Spectral Method
+\end_layout
+
+\begin_layout Standard
+Eqn (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:generalPDE"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) becomes Burgers equation for non-linear advection for 
+\begin_inset Formula $F\left(\phi\right)=\frac{1}{2}\frac{\partial\phi^{2}}{\partial x}$
+\end_inset
+
+.
+ Now eqn (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:spectralMethod"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) becomes
+\begin_inset Formula 
+\begin{equation}
+\frac{da_{k}}{dt}+\frac{ik}{2}\sum_{p+q=k}a_{p}\left(t\right)a_{q}\left(t\right)=0\label{eq:spectralBurger}
+\end{equation}
+
+\end_inset
+
+which can be solved numerically using an ODE solver,
+ starting from the initial conditions,
+ 
+\begin_inset Formula $a_{k}\left(t_{0}\right)$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsubsection*
+Exercise
+\end_layout
+
+\begin_layout Standard
+Check eqns (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:spectralLinearAdvect"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) and (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:spectralBurger"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Standard
+Work out spectral method for linear advection with a source,
+ sink and diffusion.
+\end_layout
+
+\begin_layout Standard
+Work out spectral method for the SWE
+\end_layout
+
+\begin_layout Standard
+Write a code to solve an equation using the spectral method.
+\end_layout
+
+\begin_layout Subsection
+Semi-Lagrangian Advection
+\end_layout
+
+\begin_layout Standard
+Until the use of semi-Lagrangian advection,
+ time steps in weather and climate models had been limited by the advection Courant number (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:Courant"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) so that,
+ typically,
+ air or its properties cannot be transported more than one grid box in one time step.
+ This might sound restrictive,
+ but is actually useful for accuracy,
+ so is often not a problem.
+ However,
+ the state of the art until this century was to use a latitude-longitude grid (fig 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:grids"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) in which lines of constant longitude converge towards the poles,
+ making spatial resolution unnecessarily high and making the time step restriction prohibitive.
+ Before semi-Lagrangian advection,
+ prohibitive time step restrictions near the poles were ameliorated using polar filtering 
+\begin_inset CommandInset citation
+LatexCommand citep
+before "eg."
+key "CD91"
+literal "false"
+
+\end_inset
+
+,
+ in which short wavelength waves in the zonal direction (along lines of constant latitude) were filtered out.
+ This enabled useful forecasts but also removed energy from the model.
+ The polar filtering and artificial viscosity needed to keep the Met Office model from this era stable were described as treacle,
+ limiting forecast skill.
+ This problem was circumvented by the use of semi-Lagrangian advection 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Rob82,PS84,PL91,RTS+95,Hort02,DCM+05"
+literal "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The Courant-Friedrichs-Lewy (CFL) condition states that the domain of dependence of a numerical model (the points used to calculate the value at the next time step) must enclose the physical domain of dependence (the location in space that actually influences the value of the next time step if solving the equations exactly).
+ For explicit,
+ Eulerian schemes,
+ this usually means that nothing can be transported more than one grid box in one time step.
+ Meteorologists like to keep advection (or transport) explicit,
+ for least cost and best accuracy,
+ but it is possible,
+ using Lagrangian approximations,
+ to move the domain of dependence to where it is needed.
+ This is how semi-Lagrangian works.
+ Instead of approximating spatial gradients on the grid,
+ we look upstream to where things came from,
+ and map the old upstream values onto the grid at the new time level.
+ For each grid point at the new time step,
+ we find a departure point,
+ which won't fall on a grid point,
+ and interpolate from the old values onto the departure point.
+ This enables long,
+ stable and accurate time steps,
+ but the properties transported are not conserved.
+ This means that there can be spurious sources and sinks of mass,
+ energy,
+ moisture,
+ or anything else that is transported by the model.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+placement document
+alignment document
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset External
+	template XFig
+	filename figures/semiLagrange.fig
+	width 48text%
+
+\end_inset
+
+ 
+\begin_inset External
+	template XFig
+	filename figures/hexFlux.fig
+	width 48text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Semi-Lagrangian and flux-form semi-Lagrangian
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:semiLagrangian"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection*
+Exericise
+\end_layout
+
+\begin_layout Standard
+Semi-Lagrangian solution of linear advection and Burgers equation in 1D.
+ Look at conservation and accuracy for large time steps.
+\end_layout
+
+\begin_layout Subsubsection
+Flux-form Semi-Lagrangian
+\end_layout
+
+\begin_layout Standard
+See figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:semiLagrangian"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+.
+ Cite 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "LLM96,CW84,LR96,BK25"
+literal "true"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Parallel Computing and the Pole Problem
+\end_layout
+
+\begin_layout Standard
+In the 1990s,
+ numerical weather prediction used mainframe computers such as the vector-parallel Cray YM-P.
+ Parallel means that they had more than one processor,
+ running in parallel.
+ In the 1990s,
+ Crays had 2,
+ 4,
+ 8 or of 16 processors.
+ The atmosphere was decomposed into a domains,
+ one for each processor,
+ and the equations of motion were solved separately on each domain,
+ with communication at the boundaries.
+ Each processor operated on a vector of numbers at the same time,
+ with vector lengths typically of 8,
+ 16,
+ 32 or 64.
+ These were days of rapid increases in computational power,
+ with gains in efficiency due to increases in vector length and number of processors 
+\begin_inset CommandInset citation
+LatexCommand citep
+before "eg."
+key "BDI+95"
+literal "false"
+
+\end_inset
+
+.
+ With moderate parallelisation and moderate domain size,
+ performance was not limited by parallel communication or memory band width.
+ These were the day of Moore's law,
+ with computational power doubling every two years,
+ which enabled steady increases in model resolution without drastic changes to the numerical methods or algorithms.
+\end_layout
+
+\begin_layout Standard
+Even in the 1990s,
+ vector-parallel machines were being replaced by machines with far more cheaper,
+ off the shelf microprocessors.
+ Even into the 2000s and 2010s,
+ weather prediction models scaled on these pure parallel machines,
+ with the atmosphere being decomposed into more and more,
+ smaller domains,
+ all with overlapping halo regions at their edges,
+ where information is exchanged.
+\end_layout
+
+\begin_layout Standard
+Around the turn of the century,
+ a model including semi-implicit and semi-Lagrangian methods on a C-grid was replacing the explicit B-grid model at the UK Met Office 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "CDM+97"
+literal "false"
+
+\end_inset
+
+,
+ following the successful use of SISL (semi-implicit,
+ semi-Lagrangian) at ECMWF 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "RTS+95"
+literal "false"
+
+\end_inset
+
+.
+ SISL enabled excellent weather and climate prediction on latitude-longitude grids since ISIL overcomes time step restrictions near the poles.
+ At time of writing the operational model used by the UK Met Office,
+ EndGame,
+ still uses SISL on a latutide-longitude grid,
+ and has consistently been one of the most accurate models,
+ usually second only to ECMWF 
+\begin_inset CommandInset citation
+LatexCommand citep
+before "eg."
+key "HJV+24"
+literal "false"
+
+\end_inset
+
+.
+ However the combination of further parallelisation,
+ increased resolution and the convergence of meridians towards the poles means that parallelisation progress on latitude-longitude grids is stuck – more processors are added,
+ domains get smaller and the code does not run faster or even at the same speed using higher resolution.
+ It is not possible to overcome the large amount of communication that must be done to create stable models with areas of stupidly high resolution – the weather at any location depends on the surrounding weather,
+ and points near the poles have a lot of grid points nearby that could influence their weather.
+ So inevitably there will be a lot of communication.
+ This communication is computationally expensive.
+\end_layout
+
+\begin_layout Section
+Modern Solutions for Modern Computers
+\end_layout
+
+\begin_layout Standard
+The current ECMWF supercomputer has 7,680 AMD Epyc compute nodes (
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://www.ecmwf.int/en/computing/our-facilities/supercomputer-facility
+\end_layout
+
+\end_inset
+
+) which are similar to the CPUs on desktop or laptop computers.
+ The National Oceanic and Atmospheric Administration (NOAA) uses a cluster of 63,840 cores,
+ including CPUs and GPUs (graphical processing units),
+ since GPUs are now being used to provide vector calculations which are faster that the one at a time calculations on each CPU core.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+https://www.noaa.gov/organization/information-technology/hera
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The UK Met Office has recently moved to cloud based computing provided my Microsoft's Azure service,
+ which gives them flexibility on how many and what type of core they use.
+ However the weather prediction models can rarely use the whole of any modern supercomputer because,
+ even if the whole computer were available,
+ the model would not be able to scale well enough to use so many processors efficiently;
+ processors would end up spending too much time waiting for data from neighbouring processors.
+ This is the parallel scaling problem.
+ The current Met Office model,
+ on a latitude-longitude grid,
+ can use thousands of processors efficiently,
+ but not tens of thousands,
+ which is needed for the most accurate,
+ highest resolution solutions.
+ In order to scale in parallel on 10s or 100s of thousands of processor,
+ quasi-uniform meshes of the sphere are needed,
+ which do not have convergence of points towards the poles,
+ or any other locations.
+\end_layout
+
+\begin_layout Subsection
+Meshes of the Sphere
+\end_layout
+
+\begin_layout Standard
+A latitude-longitude grid (fig 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:grids"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+,
+ left) is the most obvious way to decompose the atmosphere and solve the equations of motion using,
+ for example,
+ finite differences,
+ and models using latitude-longitude grids are producing accurate weather predictions and informative climate projections to this day.
+ The current Met Office global weather prediction uses a grid of 
+\begin_inset Formula $2,560\times1,920$
+\end_inset
+
+ points which gives grid boxes of size 
+\begin_inset Formula $15\text{ km}\times10\text{ km}$
+\end_inset
+
+ around the equator but at each pole,
+ the grid boxes will still be 10
+\begin_inset space ~
+\end_inset
+
+km in the north-south direction but less than 25
+\begin_inset space ~
+\end_inset
+
+m in the east-west direction!
+ (
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://www.metoffice.gov.uk/research/approach/modelling-systems/unified-model/weather-forecasting
+\end_layout
+
+\end_inset
+
+) In order to get smooth solutions over the poles,
+ all of the 2,560 grid points in the east-west direction around each pole will need to be in communication,
+ despite being on different processors.
+ This inevitably slows the simulation down.
+ This century,
+ weather prediction has been moving away from the latitude-longitude grid due (in part) to the parallel scaling bottle necks as the number of parallel processors increases.
+ Even before parallel scaling was a critical bottleneck,
+ ECMWF moved to a reduced grid,
+ which coarser resolution towards the poles 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "HS91"
+literal "false"
+
+\end_inset
+
+ in order to save in computation time and memory requirement.
+ This was more straightforward using a spectral model as they key point was to use few wavenumbers close to the poles.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+placement document
+alignment document
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename /home/hilary/latex/teaching/topics/grids/latLon.png
+	lyxscale 25
+	width 32text%
+
+\end_inset
+
+ 
+\begin_inset Graphics
+	filename /home/hilary/latex/teaching/topics/grids/cubedSphere10.pdf
+	lyxscale 25
+	width 32text%
+
+\end_inset
+
+ 
+\begin_inset Graphics
+	filename /home/hilary/latex/teaching/topics/grids/hexIcos.png
+	lyxscale 25
+	width 32text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Grids
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:grids"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset citation
+LatexCommand citet
+key "ST12"
+literal "false"
+
+\end_inset
+
+ reviewed meshes of the sphere,
+ describing the challenges in finding sufficiently accurate numerical methods for meshes such as the cubed sphere (middle of fig 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:grids"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) and icosahedral meshes (eg.
+ the hexagonal icosahedron,
+ right of fig 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:grids"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+,
+ which actually contains 12 pentagons).
+ The cubed sphere in fig 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:grids"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+ is quasi-uniform – all of the grid boxes have similar dimensions and a low aspect ratio.
+ However the mesh is not orthogonal – local co-ordinate systems for each of the cube faces are not at right angles.
+ A cubed sphere can be constructed to be orthogonal,
+ but then resolution clusters towards the cube corners,
+ removing the quasi-uniform property.
+ Meshes of polygons (such a the hexagonal icosahedron,
+ right of fig 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:grids"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) and meshes of triangles can be constructed to be orthogonal.
+ For these meshes,
+ orthogonality needs a different definition.
+ The triangular icosahedron is the dual of the hexagonal icosahedron.
+ This means that if you put a point at the centre of each polygon of the hexagonal icosahedron,
+ and join the points over the edges,
+ then you get the triangular icosahedron.
+ If the mesh and its dual have edges that cross at right angles,
+ then the mesh is orthogonal.
+ Orthogonal meshes have advangages in terms of accuracy and efficiency,
+ but there are other considerations,
+ such as the skewness – do the edges of the dual grids bisect each other or cross not at the edge centres 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Wel14"
+literal "false"
+
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Subsection
+Numerical Methods for Alternative Meshes
+\end_layout
+
+\begin_layout Standard
+The numerical methods developed for latitude-longitude grids,
+ such as semi-implicit,
+ semi-Lagrangian and the Arakawa C-grid have superb accuracy and are efficient as long as the domain is not decomposed onto too many parallel processors.
+ Moving to alternative meshes,
+ such as the cubed sphere or icosahedra (fig.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:grids"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+),
+ means that more complex numerical methods are needed in order to retain accuracy.
+ This section describes some more complex spatial discretisation.
+\end_layout
+
+\begin_layout Subsubsection
+Finite volumes
+\end_layout
+
+\begin_layout Standard
+In their simplest form,
+ on structured grids (such as latitude-longitude),
+ the finite volume method is similar to the finite difference method.
+ Important features of finite volume methods are:
+\end_layout
+
+\begin_layout Enumerate
+Averages of computed quantities are stored in finite volume cells and the averages change based on fluxes of the quantity over the surface faces of the cell.
+\end_layout
+
+\begin_layout Enumerate
+The finite volume cells can be any tessellating shape.
+\end_layout
+
+\begin_layout Enumerate
+The total of the computed quantity is conserved.
+\end_layout
+
+\begin_layout Standard
+In order to solve an advection equation with the finite volume method,
+ the equation must first be written in flux form,
+ with everything that varies inside a divergence term.
+ We can start with the continuity equation (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:cont"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) which can be re-written in flux form using vector-calculus identities
+\begin_inset Formula 
+\begin{align}
+\frac{\partial\rho}{\partial t}+\mathbf{u}\cdot\rho+\rho\nabla\cdot\mathbf{u} & =0\nonumber \\
+\implies\frac{\partial\rho}{\partial t}+\nabla\cdot\left(\mathbf{u}\rho\right) & =0.
+\end{align}
+
+\end_inset
+
+The finite volume method predicts density weighted volume averages (for example the mass of an atmospheric constituent,
+ 
+\begin_inset Formula $\phi$
+\end_inset
+
+) in each cell.
+ We can derive an equation for the rate of change of 
+\begin_inset Formula $\rho\phi$
+\end_inset
+
+ using the continuity equation,
+ the linear advection equation for 
+\begin_inset Formula $\phi$
+\end_inset
+
+ (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:linAdvect"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) and the chain rule:
+\begin_inset Formula 
+\begin{align}
+\frac{\partial\rho\phi}{\partial t} & =\rho\frac{\partial\phi}{\partial t}+\phi\frac{\partial\rho}{\partial t}\nonumber \\
+ & =\rho\left\{ -\mathbf{u}\cdot\nabla\phi\right\} +\phi\left\{ -\nabla\cdot\left(\mathbf{u}\rho\right)\right\} \nonumber \\
+\implies\frac{\partial\rho\phi}{\partial t} & +\nabla\cdot\left(\rho\mathbf{u}\phi\right)=0.\label{eq:linAdvectFlux}
+\end{align}
+
+\end_inset
+
+To simplify the definition of the finite volume method,
+ we will assume that 
+\begin_inset Formula $\rho$
+\end_inset
+
+ is uniform in space and time and the atmosphere is incompressible:
+ 
+\begin_inset Formula $\nabla\cdot\mathbf{u}=0$
+\end_inset
+
+.
+ We consider a cell with volume 
+\begin_inset Formula $\mathcal{V}$
+\end_inset
+
+ and integrate over this volume to find the rate of change of the volume average:
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\tilde{\phi}}{\partial t}=\frac{1}{\mathcal{V}}\int_{\mathcal{V}}\frac{\partial\phi}{\partial t}\ dV=-\frac{1}{\mathcal{V}}\int_{\mathcal{V}}\nabla\cdot\left(\mathbf{u}\phi\right)\ dV
+\end{equation}
+
+\end_inset
+
+(the last step using the linear advection equation in flux form,
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:linAdvectFlux"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+).
+ We now apply Gauss's divergence theorem to transform the integral to an integral over the surface of the volume:
+\begin_inset Formula 
+\begin{equation}
+\int_{\mathcal{V}}\nabla\cdot\left(\mathbf{u}\phi\right)\ dV=\int_{S}\mathbf{u}\phi\cdot\mathbf{dS}\implies\frac{\partial\tilde{\phi}}{\partial t}=-\frac{1}{\mathcal{V}}\int_{S}\phi\mathbf{u}\cdot\mathbf{dS}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $S$
+\end_inset
+
+ is the surface of volume 
+\begin_inset Formula $\mathcal{V}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{dS}$
+\end_inset
+
+ is the outward pointing normal vector to the surface.
+ If we assume that the volume 
+\begin_inset Formula $\mathcal{V}$
+\end_inset
+
+ has a discrete number of faces,
+ indexed with 
+\begin_inset Formula $f$
+\end_inset
+
+,
+ each with outward pointing normal vector 
+\begin_inset Formula $\mathbf{S}_{f}$
+\end_inset
+
+ (with magnitude equal to the face area),
+ then the finite volume discretisation of the linear advection equation becomes
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\tilde{\phi}}{\partial t}=-\frac{1}{\mathcal{V}}\sum_{f}\phi_{f}\mathbf{u}_{f}\cdot\mathbf{S}_{f}\label{eq:FVadvect}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\phi_{f}$
+\end_inset
+
+ is the value of 
+\begin_inset Formula $\phi$
+\end_inset
+
+ mapped onto face 
+\begin_inset Formula $f$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{u}_{f}\cdot\mathbf{S}_{f}$
+\end_inset
+
+ is the volume flux through face 
+\begin_inset Formula $f$
+\end_inset
+
+,
+ so that 
+\begin_inset Formula $\phi_{f}\mathbf{u}_{f}\cdot\mathbf{S}_{f}$
+\end_inset
+
+ is the volume flux of 
+\begin_inset Formula $\phi$
+\end_inset
+
+ through face 
+\begin_inset Formula $f$
+\end_inset
+
+.
+ There are countless different finite volume methods and they are distinct in the way that they map volume averages,
+ 
+\begin_inset Formula $\tilde{\phi}$
+\end_inset
+
+,
+ onto face averages,
+ 
+\begin_inset Formula $\phi_{f}$
+\end_inset
+
+.
+ In order to solve (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:FVadvect"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+),
+ the fluxes,
+ 
+\begin_inset Formula $\mathbf{u}_{f}\cdot\mathbf{S}_{f}$
+\end_inset
+
+,
+ must be supplied from elsewhere in the model.
+ The fluxes and the face averages,
+ 
+\begin_inset Formula $\phi_{f}$
+\end_inset
+
+,
+ are equal and opposite for the two cells either side of face 
+\begin_inset Formula $f$
+\end_inset
+
+,
+ so what leaves one cell will enter its neighbour,
+ which is what makes finite volume methods conservative,
+ regardless of how the mapping is done.
+\end_layout
+
+\begin_layout Subsubsection*
+Exercise
+\end_layout
+
+\begin_layout Standard
+Often,
+ on uniform and structured grids,
+ finite volume methods can be written as finite difference methods and vice versa.
+ Eqn (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:CS"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) is a finite difference approximation for 
+\begin_inset Formula $\partial\phi/\partial x$
+\end_inset
+
+ at grid point 
+\begin_inset Formula $j$
+\end_inset
+
+.
+ If instead we use 
+\begin_inset Formula $j$
+\end_inset
+
+ to index one-dimensional grid boxes,
+ with size 
+\begin_inset Formula $\Delta x$
+\end_inset
+
+ and edges at locations 
+\begin_inset Formula $\left(j\pm1/2\right)\Delta x$
+\end_inset
+
+,
+ indexed as 
+\begin_inset Formula $j\pm1/2$
+\end_inset
+
+,
+ then we can derive a finite volume approximation for 
+\begin_inset Formula $\nabla\cdot\left(\mathbf{u}\phi\right)$
+\end_inset
+
+.
+ If we assume that the velocity,
+ 
+\begin_inset Formula $\mathbf{u}=(u,0,0)$
+\end_inset
+
+ is uniform in space and time and if we use the centred mapping
+\begin_inset Formula 
+\begin{equation}
+\phi_{j+1/2}=\frac{1}{2}\left(\tilde{\phi}_{j}+\tilde{\phi}_{j+1}\right),
+\end{equation}
+
+\end_inset
+
+show that the finite volume method gives the same approximation for 
+\begin_inset Formula $\partial\phi/\partial x$
+\end_inset
+
+ as the centred finite difference method (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:CS"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Subsubsection
+Spectral Elements
+\end_layout
+
+\begin_layout Subsubsection
+Discontinuous Galerkin
+\end_layout
+
+\begin_layout Subsubsection
+Mixed Finite Elements
+\end_layout
+
+\begin_layout Section
+Is AI the Future?
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset bibtex
+LatexCommand bibtex
+btprint "btPrintCited"
+bibfiles "numerics"
+options "abbrvnat"
+encoding "default"
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document

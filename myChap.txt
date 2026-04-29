@@ -1,0 +1,3 @@
+"Established and Emerging Numerical Methods in Weather and Climate Prediction"
+
+This chapter will review some of the numerical methods used in the dynamical core of models of the atmosphere, focusing on the requirements and constraints, and the advantages and disadvantages of different methods and the different grids of the sphere.
