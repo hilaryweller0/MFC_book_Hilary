@@ -93,10 +93,6 @@
 
 \begin_body
 
-\begin_layout Chapter
-Numerics in Meteorology
-\end_layout
-
 \begin_layout Standard
 \begin_inset CommandInset toc
 LatexCommand tableofcontents
@@ -104,6 +100,10 @@ LatexCommand tableofcontents
 \end_inset
 
 
+\end_layout
+
+\begin_layout Chapter
+Numerics in Meteorology
 \end_layout
 
 \begin_layout Standard
@@ -626,7 +626,7 @@ nolink "false"
 
 This is the explicit,
  centered in time,
- centered in space advection scheme (explicit meaning that the solution at the next time level is found from existing solutions).
+ centered in space (CTCS) advection scheme (explicit meaning that the solution at the next time level is found from existing solutions).
  
 \begin_inset CommandInset citation
 LatexCommand citet
@@ -3455,6 +3455,13 @@ Write a code to solve an equation using the spectral method.
 
 \begin_layout Subsection
 Semi-Lagrangian Advection
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:SL"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -3602,34 +3609,6 @@ Exericise
 \begin_layout Standard
 Semi-Lagrangian solution of linear advection and Burgers equation in 1D.
  Look at conservation and accuracy for large time steps.
-\end_layout
-
-\begin_layout Subsubsection
-Flux-form Semi-Lagrangian
-\end_layout
-
-\begin_layout Standard
-See figure 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:semiLagrangian"
-plural "false"
-caps "false"
-noprefix "false"
-nolink "false"
-
-\end_inset
-
-.
- Cite 
-\begin_inset CommandInset citation
-LatexCommand citet
-key "LLM96,CW84,LR96,BK25"
-literal "true"
-
-\end_inset
-
-
 \end_layout
 
 \begin_layout Section
@@ -4069,7 +4048,7 @@ nolink "false"
 \begin_inset Formula 
 \begin{align}
 \frac{\partial\rho}{\partial t}+\mathbf{u}\cdot\rho+\rho\nabla\cdot\mathbf{u} & =0\nonumber \\
-\implies\frac{\partial\rho}{\partial t}+\nabla\cdot\left(\mathbf{u}\rho\right) & =0.
+\implies\frac{\partial\rho}{\partial t}+\nabla\cdot\left(\mathbf{u}\rho\right) & =0.\label{eq:contFlux}
 \end{align}
 
 \end_inset
@@ -4352,6 +4331,309 @@ nolink "false"
 \end_inset
 
 ).
+\end_layout
+
+\begin_layout Subsubsection
+Flux-form Semi-Lagrangian
+\end_layout
+
+\begin_layout Standard
+The semi-Lagrangian method,
+ described in section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:SL"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+,
+ has played a large role in enabling unprecedented accuracy in weather prediction.
+ However standard (interpolating) semi-Lagrangian is not conservative – the total mass of the quantity advected can change just because it is being advected.
+ This is not correct and makes semi-Lagrangian unsuitable for climate prediction and for the next generation in weather prediction.
+ A popular solution is flux-form semi-Lagrangian (FFSL),
+ which is a type of finite volume advection scheme.
+ FFSL is used in FV3 by the National Oceanic and Atmospheric Administration 
+\begin_inset CommandInset citation
+LatexCommand citep
+before "NOAA,"
+key "HCP+21"
+literal "false"
+
+\end_inset
+
+,
+ in the NCAR Community Atmosphere Model,
+ CAM-FV 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "NRC+10"
+literal "false"
+
+\end_inset
+
+,
+ in the Japanese NICAM 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Miu07b"
+literal "false"
+
+\end_inset
+
+,
+ in the German ICON model 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://www.dwd.de/EN/research/weatherforecasting/num_modelling/01_num_weather_prediction_modells/icon_description.html
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "ZRR+15"
+literal "false"
+
+\end_inset
+
+ and will be used in the next Met Office model,
+ LFRic 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "BK25"
+literal "false"
+
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+Rather than interpolating onto a departure point,
+ in FFSL,
+ interpolation is onto the volume of air that sweeps through each face in a time step (fig 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:SL"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+,
+ right).
+ Then,
+ using the finite volume method,
+ the contents of each cell is updated based on the amounts that enter and leave at each face.
+ FFSL is therefore conservative.
+ FFSL can be made to be stable and accurate for large time steps by mapping onto the swept volume over multiple cells upwind of each face.
+ 
+\end_layout
+
+\begin_layout Standard
+FFSL is used so widely and is such an advantageous solution of the linear advection problem,
+ that it has been created independently in different institutions and given different names.
+ The piecewise parabolic method 
+\begin_inset CommandInset citation
+LatexCommand citep
+before "PPM,"
+key "CW84"
+literal "false"
+
+\end_inset
+
+ was one of the first FFSL methods,
+ and was described as a higher-order Godunov method.
+ 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "LLM96"
+literal "false"
+
+\end_inset
+
+ described this type of scheme as 
+\begin_inset Quotes eld
+\end_inset
+
+forward in time
+\begin_inset Quotes erd
+\end_inset
+
+,
+ and described how to extend them to two and three dimensions while maintaining conservation and constancy preservation – a field that starts constant should remain constant when advected by a non-divergent velocity field.
+ In the same journal issue,
+ 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "LR96"
+literal "false"
+
+\end_inset
+
+ described a similar scheme and named it 
+\begin_inset Quotes eld
+\end_inset
+
+flux-form semi-Lagrangian
+\begin_inset Quotes erd
+\end_inset
+
+.
+ This was the scheme that is still in use in the NOAA model,
+ FV3.
+ There have been numerous improvements since the 1990s,
+ but of particular note is SWIFT 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "BK25"
+literal "true"
+
+\end_inset
+
+ which extends the long time step stability,
+ conservation and constancy preservation to variable density advection,
+ providing the advection scheme for the new Met Office model,
+ LFRic.
+ 
+\end_layout
+
+\begin_layout Standard
+In many ways,
+ PPM and FFSL seem unbeatable.
+ The only down side is that,
+ in order to achieve accuracy and efficiency for large time steps,
+ the grid must be be regular.
+ That means that the grid must consist of (possibly distorted) boxes that are arranged in the Cartesian directions.
+ This precludes the use of FFSL with large time steps for icosahedral meshes,
+ and means that special measures are needed to handle the corners of the cubed-sphere mesh.
+ This is because the COSMIC splitting that is used to transform a scheme like PPM from one to two and three dimensions,
+ relies on searching for departure points along co-ordinate directions.
+ 
+\end_layout
+
+\begin_layout Subsubsection*
+Exercises
+\end_layout
+
+\begin_layout Enumerate
+Starting from the flux-form linear advection equation (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:linAdvectFlux"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+),
+ prove constant preservation;
+ that if the advected quantity,
+ 
+\begin_inset Formula $\phi$
+\end_inset
+
+,
+ starts uniform,
+ then it will stay uniform,
+ given the following assumptions:
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+The density is uniform and 
+\begin_inset Formula $\nabla\cdot\mathbf{u}=0$
+\end_inset
+
+ (incompressible flow).
+\end_layout
+
+\begin_layout Enumerate
+The density is non-uniform and varies according to the continuity equation (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:contFlux"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+),
+ with 
+\begin_inset Formula $\nabla\cdot\mathbf{u}\ne0$
+\end_inset
+
+ (compressible flow).
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+The Lax-Wendroff advection scheme can be expressed as a FFSL scheme.
+ Using the same notation and one-dimensional grid as for the finite difference CTCS scheme (eqn 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:CTCSadvect"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+),
+ the Lax-Wendroff advection scheme can be written
+\begin_inset Formula 
+\begin{align*}
+\frac{\phi_{j}^{(n+1)}-\phi_{j}^{(n)}}{\Delta t} & =-\frac{u_{j+1/2}\phi_{j+1/2}-u_{j-1/2}\phi_{j-1/2}}{\Delta x}\\
+\text{where }\phi_{j+1/2} & =\nicefrac{1}{2}\left(1+c\right)\phi_{j}^{(n)}+\nicefrac{1}{2}\left(1-c\right)\phi_{j+1}^{(n)}\\
+c & =u\Delta t/\Delta x.
+\end{align*}
+
+\end_inset
+
+Write code to solve the linear advection equation using Lax-Wendroff and compare with the CTCS solutions found in exercise 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Ex_CTCSadvection"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+.
+ Explore how the errors depend on Courant number for each scheme.
+ 
+\end_layout
+
+\begin_layout Enumerate
+Assuming 
+\begin_inset Formula $u$
+\end_inset
+
+ is uniform,
+ determine if the Lax-Wendroff scheme has constancy preservation in one dimension.
+ Check that your numerical implementation also has this property.
+\end_layout
+
+\begin_layout Subsubsection
+Finite Volume A- and C-grids for unstructured meshes
 \end_layout
 
 \begin_layout Subsubsection
