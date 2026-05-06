@@ -1,0 +1,12 @@
+\begin{picture}(0,0)%
+\includegraphics{climate_numFigures/semiLagrange/semiLagrange}%
+\end{picture}%
+\setlength{\unitlength}{4144sp}%
+\begin{picture}(7224,6367)(1339,-6416)
+\put(2881,-4771){\makebox(0,0)[lb]{\smash{\fontsize{36}{43.2}\usefont{T1}{ptm}{m}{n}{\color[rgb]{0,0,0}d}%
+}}}
+\put(3811,-2041){\makebox(0,0)[lb]{\smash{\fontsize{36}{43.2}\usefont{T1}{ptm}{m}{n}{\color[rgb]{0,0,0}$\psi_{ij}$}%
+}}}
+\put(6571,-1306){\makebox(0,0)[lb]{\smash{\fontsize{36}{43.2}\usefont{T1}{ptm}{m}{n}{\color[rgb]{0,0,0}$\mathbf{u}$}%
+}}}
+\end{picture}%

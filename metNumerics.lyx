@@ -93,17 +93,36 @@
 
 \begin_body
 
-\begin_layout Standard
-\begin_inset CommandInset toc
-LatexCommand tableofcontents
+\begin_layout Chapter
+Numerics in Meteorology:
+\begin_inset Newline newline
+\end_inset
+
+Past,
+ Present and Future
+\begin_inset Argument 1
+status open
+
+\begin_layout Plain Layout
+Numerics in Meteorology
+\end_layout
 
 \end_inset
 
 
 \end_layout
 
-\begin_layout Chapter
-Numerics in Meteorology
+\begin_layout Standard
+
+\series bold
+Author:
+
+\series default
+ Hilary Weller
+\end_layout
+
+\begin_layout Section*
+Abstract
 \end_layout
 
 \begin_layout Standard
@@ -2746,7 +2765,7 @@ E
 \begin_layout Plain Layout
 \begin_inset External
 	template XFig
-	filename ArakawaGrids/A.fig
+	filename climate_numFigures/ArakawaGrids/A.fig
 	width 18text%
 
 \end_inset
@@ -2762,7 +2781,7 @@ E
 \begin_layout Plain Layout
 \begin_inset External
 	template XFig
-	filename ArakawaGrids/B.fig
+	filename climate_numFigures/ArakawaGrids/B.fig
 	width 18text%
 
 \end_inset
@@ -2778,7 +2797,7 @@ E
 \begin_layout Plain Layout
 \begin_inset External
 	template XFig
-	filename ArakawaGrids/C.fig
+	filename climate_numFigures/ArakawaGrids/C.fig
 	width 18text%
 
 \end_inset
@@ -2794,7 +2813,7 @@ E
 \begin_layout Plain Layout
 \begin_inset External
 	template XFig
-	filename ArakawaGrids/D.fig
+	filename climate_numFigures/ArakawaGrids/D.fig
 	width 18text%
 
 \end_inset
@@ -2810,7 +2829,7 @@ E
 \begin_layout Plain Layout
 \begin_inset External
 	template XFig
-	filename ArakawaGrids/E.fig
+	filename climate_numFigures/ArakawaGrids/E.fig
 	width 18text%
 
 \end_inset
@@ -3569,7 +3588,7 @@ status open
 \begin_layout Plain Layout
 \begin_inset External
 	template XFig
-	filename figures/semiLagrange.fig
+	filename climate_numFigures/semiLagrange/semiLagrange.fig
 	width 48text%
 
 \end_inset
@@ -3577,7 +3596,7 @@ status open
  
 \begin_inset External
 	template XFig
-	filename figures/hexFlux.fig
+	filename climate_numFigures/semiLagrange/hexFlux.fig
 	width 48text%
 
 \end_inset
@@ -3852,7 +3871,7 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename /home/hilary/latex/teaching/topics/grids/latLon.png
+	filename climate_numFigures/grids/latLon.png
 	lyxscale 25
 	width 32text%
 
@@ -3860,7 +3879,7 @@ status open
 
  
 \begin_inset Graphics
-	filename /home/hilary/latex/teaching/topics/grids/cubedSphere10.pdf
+	filename climate_numFigures/grids/cubedSphere10.pdf
 	lyxscale 25
 	width 32text%
 
@@ -3868,7 +3887,7 @@ status open
 
  
 \begin_inset Graphics
-	filename /home/hilary/latex/teaching/topics/grids/hexIcos.png
+	filename climate_numFigures/grids/hexIcos.png
 	lyxscale 25
 	width 32text%
 
@@ -4851,19 +4870,6 @@ Mixed Finite Elements
 
 \begin_layout Section
 Is AI the Future?
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset bibtex
-LatexCommand bibtex
-btprint "btPrintCited"
-bibfiles "numerics"
-options "abbrvnat"
-encoding "default"
-
-\end_inset
-
-
 \end_layout
 
 \end_body

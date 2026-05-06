@@ -1,0 +1,12 @@
+\begin{picture}(0,0)%
+\includegraphics{climate_numFigures/semiLagrange/hexFlux}%
+\end{picture}%
+\setlength{\unitlength}{4144sp}%
+\begin{picture}(6465,5800)(570,-5696)
+\put(5221,-646){\makebox(0,0)[lb]{\smash{\fontsize{36}{43.2}\usefont{T1}{ptm}{m}{n}{\color[rgb]{0,0,0}$\mathbf{u}$}%
+}}}
+\put(3466,-2041){\makebox(0,0)[lb]{\smash{\fontsize{36}{43.2}\usefont{T1}{ptm}{m}{n}{\color[rgb]{0,0,0}$\psi_f$}%
+}}}
+\put(2926,-2491){\makebox(0,0)[lb]{\smash{\fontsize{36}{43.2}\usefont{T1}{ptm}{m}{n}{\color[rgb]{0,0,0}$V$}%
+}}}
+\end{picture}%

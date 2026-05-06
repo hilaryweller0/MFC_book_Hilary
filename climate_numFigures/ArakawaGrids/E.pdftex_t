@@ -1,0 +1,24 @@
+\begin{picture}(0,0)%
+\includegraphics{climate_numFigures/ArakawaGrids/E}%
+\end{picture}%
+\setlength{\unitlength}{1579sp}%
+\begin{picture}(4827,4824)(-14,-3973)
+\put(676,-3286){\makebox(0,0)[lb]{\smash{\fontsize{14}{16.8}\usefont{T1}{ptm}{m}{n}{\color[rgb]{0,0,0}p}%
+}}}
+\put(2221,-1396){\makebox(0,0)[lb]{\smash{\fontsize{14}{16.8}\usefont{T1}{ptm}{m}{n}{\color[rgb]{0,0,0}p}%
+}}}
+\put(2101,239){\makebox(0,0)[lb]{\smash{\fontsize{14}{16.8}\usefont{T1}{ptm}{m}{n}{\color[rgb]{0,0,0}u, v}%
+}}}
+\put(601,-211){\makebox(0,0)[lb]{\smash{\fontsize{14}{16.8}\usefont{T1}{ptm}{m}{n}{\color[rgb]{0,0,0}p}%
+}}}
+\put(  1,-1411){\makebox(0,0)[lb]{\smash{\fontsize{14}{16.8}\usefont{T1}{ptm}{m}{n}{\color[rgb]{0,0,0}u, $v$}%
+}}}
+\put(2401,-3511){\makebox(0,0)[lb]{\smash{\fontsize{14}{16.8}\usefont{T1}{ptm}{m}{n}{\color[rgb]{0,0,0}u, v}%
+}}}
+\put(3751,-3211){\makebox(0,0)[lb]{\smash{\fontsize{14}{16.8}\usefont{T1}{ptm}{m}{n}{\color[rgb]{0,0,0}p}%
+}}}
+\put(3826,-2161){\makebox(0,0)[lb]{\smash{\fontsize{14}{16.8}\usefont{T1}{ptm}{m}{n}{\color[rgb]{0,0,0}u, $v$}%
+}}}
+\put(3751,-286){\makebox(0,0)[lb]{\smash{\fontsize{14}{16.8}\usefont{T1}{ptm}{m}{n}{\color[rgb]{0,0,0}p}%
+}}}
+\end{picture}%
