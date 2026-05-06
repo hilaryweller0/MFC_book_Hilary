@@ -2389,6 +2389,13 @@ Three Dimensional Solutions on Mainframe Computers
 
 \begin_layout Subsubsection
 Arakawa's Numerics
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:ArakawaGrids"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -4008,6 +4015,13 @@ nolink "false"
 
 \begin_layout Subsubsection
 Finite volumes
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:FV"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -4335,6 +4349,13 @@ nolink "false"
 
 \begin_layout Subsubsection
 Flux-form Semi-Lagrangian
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:FFSL"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -4634,6 +4655,186 @@ Assuming
 
 \begin_layout Subsubsection
 Finite Volume A- and C-grids for unstructured meshes
+\end_layout
+
+\begin_layout Standard
+Sections 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:FV"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:FFSL"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+ described finite volume methods for solving the linear advection equation,
+ which has one dependent variable,
+ which is stored as a volume average in each cell.
+ Once we have multiple variables that create waves and,
+ in particular,
+ we are solving the momentum equation for the velocity components,
+ we must return to Arakawa's problem of where to store different variables (section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:ArakawaGrids"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+).
+ This has added complexity because a finite volume mesh can include cells of arbitrary shapes,
+ such as the triangles,
+ pentagons and hexagons in icosahedral meshes (fig.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:grids"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+).
+ 
+\end_layout
+
+\begin_layout Standard
+The purest form of finite volume is co-located,
+ of A-grid,
+ so that the velocity is stored as volume averages in the cells,
+ the same as the variables that are advected by the wind.
+ This approach is used effectively by NICAM 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "SMT+08"
+literal "false"
+
+\end_inset
+
+ which stores all variables apart from vertical velocity in cells.
+ Vertical velocity is stored at the top and bottom faces of cells.
+ So NICAM uses the A-grid in the horizontal and the C-grid (staggered) in the vertical.
+ ECMWF's finite volume model,
+ PMAP,
+ or FVM,
+ currently a research model,
+ is fully co-located with all variable stored in cells 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "KDK+19"
+literal "false"
+
+\end_inset
+
+ and is close to ECMWF's spectral transform model in terms of accuracy and efficiency.
+ 
+\end_layout
+
+\begin_layout Standard
+Despite excellent solutions from co-located (A-grid) finite volume models on various grids,
+ the A-grid is always prone to grid-scale oscillations,
+ which can usually be smoothed out with some kind of diffusion or filter.
+ This has motivated the development of C-grid discretisations on triangles for the ICON model 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Bon04,ZRR+15"
+literal "false"
+
+\end_inset
+
+ and on hexagons and pentagons for,
+ example,
+ MPAS 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "TRSK09,SKD+12,RPH+13"
+literal "false"
+
+\end_inset
+
+.
+ ICON produces skilful global weather forecasts,
+ but the underlying dynamical core is still prone to grid-scale oscillations and requires diffusion.
+ It turns out that the C-grid on triangles is not as well behaved as hoped.
+ 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "Gas11"
+literal "false"
+
+\end_inset
+
+ explained that the oscillations on triangles cannot be controlled by the insufficient normal velocity components at the triangle edges,
+ and that the hexagonal C-grid performs better.
+ MPAS,
+ the 
+\begin_inset Quotes eld
+\end_inset
+
+Model for Prediction Across Scales
+\begin_inset Quotes erd
+\end_inset
+
+,
+ was developed as a global version of the popular WRF model and uses the hexagonal C-grid 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "SKD+12"
+literal "false"
+
+\end_inset
+
+.
+ It is free of grid-scale oscillations in height or pressure,
+ but spurious grid-scale circulations can appear around the hexagon vertices,
+ a manifestation of the Hollingsworth instability 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Gas13"
+literal "false"
+
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+Finite-volume methods for wave equations (such as the A- and C-grid finite voulme methods),
+ tend to be low-order accurate – usually up to second-order.
+ However,
+ despite the smooth,
+ well behaved solutions,
+ the C-grid on the hexagonal-icosahedron is found to be much less than second-order,
+ with a complete loss of convergence with resolution in some situations 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "YWM+20"
+literal "false"
+
+\end_inset
+
+,
+ who found serious deficiencies in both the A- and C-grids on hexagonal icosahedral meshes.
+ This provides a strong motivation to move to more complex numerical methods on quasi-uniform meshes.
 \end_layout
 
 \begin_layout Subsubsection
