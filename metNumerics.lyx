@@ -4853,11 +4853,154 @@ literal "false"
 
 ,
  who found serious deficiencies in both the A- and C-grids on hexagonal icosahedral meshes.
- This provides a strong motivation to move to more complex numerical methods on quasi-uniform meshes.
+ This provides a strong motivation to move to more complex numerical methods for quasi-uniform meshes.
 \end_layout
 
 \begin_layout Subsubsection
 Spectral Elements
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+placement document
+alignment document
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename climate_numFigures/cubedSphereSEM.jpg
+	lyxscale 50
+	width 100text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Figure 4 from 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "LJTN10"
+literal "false"
+
+\end_inset
+
+ showing 
+\begin_inset Quotes eld
+\end_inset
+
+(left) A graphical illustration of the Gauss-Legendre-Lobatto quadrature points (red unfilled circles) in an element (blue boundary) of the HOMME model.
+ (right) The mapping of every element onto the sphere.
+ Green lines are the boundary of the cubed-sphere faces
+\begin_inset Quotes erd
+\end_inset
+
+.
+ Reproduced with permission from John Wiley and Sons.
+ Copyright 2010 by the American Geophysical Union.
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:CAMSE"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The spectral element method enables arbitrarily high-order accuracy on a variety of meshes.
+ Fourth-order accurate spectral elements are used in a version of NCAR Community Atmosphere Model,
+ CAM-SE 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "NRC+10,ELM+13"
+literal "false"
+
+\end_inset
+
+ on a cubed sphere (fig.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:CAMSE"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+,
+ right).
+ Considering just the horizontal discretisation in CAM-SE,
+ the surface of the Earth is divided into quadrilateral elements.
+ The solution is approximated on each element using a basis function which is a two-dimensional,
+ third-order polynomial (to achieve fourth-order accuracy).
+ A key advantage of spectral elements is that it uses Lagrange interpolation 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "WTB+07"
+literal "false"
+
+\end_inset
+
+ which means that the basis functions passes through nodes on each element exactly and the weights of each basis function are cheap to compute and avoid global communication.
+ By placing these notes at Gauss-Legendre-Lobatto quadrature points (fig.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:CAMSE"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+,
+ left) the order of accuracy is one more than the degree of the polynomial used.
+ 
+\end_layout
+
+\begin_layout Standard
+The high-order accuracy of spectral elements,
+ and the continuity between elements,
+ makes them excellent choices for smoothly varying fields such as pressure,
+ but less suitable for fields with more fine scale variability such as clouds and precipitation 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "WTB+07"
+literal "false"
+
+\end_inset
+
+.
+ The spectral element version of CAM produces a similar climate to the finite volume version 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "ELM+13"
+literal "false"
+
+\end_inset
+
+ but the spectral element version is more efficient on larger super computers and provides more detail at fine resolutions.
+ 
 \end_layout
 
 \begin_layout Subsubsection
@@ -4866,6 +5009,10 @@ Discontinuous Galerkin
 
 \begin_layout Subsubsection
 Mixed Finite Elements
+\end_layout
+
+\begin_layout Standard
+SE and DG are co-located
 \end_layout
 
 \begin_layout Section
