@@ -1,5 +1,6 @@
 
-\chapter[Numerics in Meteorology]{Numerics in Meteorology: Past, Present and Future}
+\chapter[Numerics in Meteorology]{Numerics in Meteorology:\protect \\
+Past, Present and Future}
 
 \textbf{Author:} Hilary Weller
 
@@ -156,17 +157,29 @@ The Courant number is
 \begin{equation}
 c=\frac{u\Delta t}{\Delta x}.\label{eq:Courant}
 \end{equation}
-Set the Courant number to be 0.4 and run for 10 time steps. You can
+
+\begin{enumerate}
+\item Set the Courant number to be 0.4 and run for 10 time steps. You can
 compare with the analytic solution
 \begin{equation}
 \theta\left(x,t\right)=\theta\left(x-ut,0\right).
 \end{equation}
-Can you animate the solution? What can you say about the part of the
+\item Can you animate the solution? What can you say about the part of the
 solution that started from the smooth initial conditions? What do
 the discontinuities do to the solution? Why?
-
-Next try setting the Courant number to be 1.1 and animate the solution
+\item Next try setting the Courant number to be 1.1 and animate the solution
 for 5 time steps. What is happening now? Why?
+\item Using CTCS, oscillations are generated where the initial conditions
+are discontinuous, even when the Courant number is below one. A solution
+is to use a spatial discretisation that takes information from upwind
+only, not from downwind. The first-order accurate, forward in time,
+backward in space (FTBS) scheme will always give smooth solutions
+for Courant numbers less than one (and for $u>0$)
+\begin{equation}
+\theta_{j}^{(n+1)}=\theta_{j}^{(n)}-\frac{u\Delta t}{\Delta x}\left(\theta_{j}^{(n)}-\theta_{j-1}^{(n)}\right).
+\end{equation}
+Code up FTBS and compare the solutions with CTCS.
+\end{enumerate}
 
 \subsection{Insights Enabling Numerical Weather Prediction}
 
@@ -1149,13 +1162,80 @@ the C-grid on the hexagonal-icosahedron is found to be much less than
 second-order, with a complete loss of convergence with resolution
 in some situations \citep{YWM+20}, who found serious deficiencies
 in both the A- and C-grids on hexagonal icosahedral meshes. This provides
-a strong motivation to move to more complex numerical methods on quasi-uniform
-meshes.
+a strong motivation to move to more complex numerical methods for
+quasi-uniform meshes.
 
 \subsubsection{Spectral Elements}
 
+\begin{figure}
+\includegraphics[width=1\textwidth]{climate_numFigures/cubedSphereSEM}
+
+\caption{Figure 4 from \citet{LJTN10} showing ``(left) A graphical illustration
+of the Gauss-Legendre-Lobatto quadrature points (red unfilled circles)
+in an element (blue boundary) of the HOMME model. (right) The mapping
+of every element onto the sphere. Green lines are the boundary of
+the cubed-sphere faces''. Reproduced with permission from John Wiley
+and Sons. Copyright 2010 by the American Geophysical Union.}\label{fig:CAMSE}
+\end{figure}
+
+The spectral element method enables arbitrarily high-order accuracy
+on a variety of meshes, and is extremely efficient on massively parallel
+computers. Fourth-order accurate spectral elements are used in a version
+of NCAR Community Atmosphere Model, CAM-SE \citep{NRC+10,ELM+13}
+on a cubed sphere (fig. \ref{fig:CAMSE}, right). Considering just
+the horizontal discretisation in CAM-SE, the surface of the Earth
+is divided into quadrilateral elements. The solution is approximated
+on each element using a basis function which is a two-dimensional,
+third-order polynomial (to achieve fourth-order accuracy). A key advantage
+of spectral elements is that it uses Lagrange interpolation \citep{WTB+07}
+which means that the basis functions passes through nodes on each
+element exactly and the weights of each basis function are cheap to
+compute and avoid global communication. By placing these notes at
+Gauss-Legendre-Lobatto quadrature points (fig. \ref{fig:CAMSE}, left)
+the order of accuracy is one more than the degree of the polynomial
+used. 
+
+The high-order accuracy of spectral elements, and the continuity between
+elements, makes them excellent choices for smoothly varying fields
+such as pressure, but less suitable for fields with more fine scale
+variability such as clouds and precipitation \citep{WTB+07}. The
+spectral element version of CAM produces a similar climate to the
+finite volume version \citep{ELM+13} but the spectral element version
+is more efficient on larger super computers and provides more detail
+at fine resolutions. 
+
+Spectral elements are continuous Galerkin methods. This means that
+there is a level of continuity between elements and spectral elements
+are accurate when solutions are smooth. The discretisation is symmetric
+-- there is no account taken of which direction is upwind. We learned
+in the exercise \ref{subsec:Ex_CTCSadvection} that symmetric discretisations
+lead to oscillatory solutions when advecting discontinuous fields,
+whereas using upwind information to calculate gradients enables smooth
+solutions. Spectral element methods instead rely on small amounts
+of diffusion to maintain stability and smooth solutions \citep{GTU+14}.
+
 \subsubsection{Discontinuous Galerkin}
+
+The discontinuous Galerkin (DG) method is similar to the spectral
+element method (a continuous Galerkin method), but discontinuities
+are allowed between elements. Like the finite volume method, there
+are fluxes between elements, leading to asymmetry, and more upwind
+information than downwind is used in calculations. DG can handle discontinuous
+fields without the need to introduce artificial diffusion, but is
+is slightly more expensive. The cost is offset by the excellent scaling
+properties on massively parallel computers. DG is not currently being
+used operationally for weather prediction but powerful research models
+exist such as NUMA-NEPTUNE, \citep{KG12} developed at the Naval Postgraduate
+School and DG-COSMO \citep{SBB+14}, a version of COSMO, which is
+a limited area model that was used by Deutscher Wetterdienst before
+ICON was operational.
 
 \subsubsection{Mixed Finite Elements}
 
-\section{Is AI the Future?}
+SE and DG are co-located. This motivates mixed finite elements
+
+\section{Is Machine Learning the Future of Weather and Climate Prediction}
+
+ML weather forecasts are great. Current ML models drift and usually
+diverge to an unrealistic state within a few weeks. Lots of work to
+do here.

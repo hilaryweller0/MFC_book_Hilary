@@ -724,6 +724,10 @@ c=\frac{u\Delta t}{\Delta x}.\label{eq:Courant}
 
 \end_inset
 
+
+\end_layout
+
+\begin_layout Enumerate
 Set the Courant number to be 0.4 and run for 10 time steps.
  You can compare with the analytic solution
 \begin_inset Formula 
@@ -733,16 +737,43 @@ Set the Courant number to be 0.4 and run for 10 time steps.
 
 \end_inset
 
+
+\end_layout
+
+\begin_layout Enumerate
 Can you animate the solution?
  What can you say about the part of the solution that started from the smooth initial conditions?
  What do the discontinuities do to the solution?
  Why?
 \end_layout
 
-\begin_layout Standard
+\begin_layout Enumerate
 Next try setting the Courant number to be 1.1 and animate the solution for 5 time steps.
  What is happening now?
  Why?
+\end_layout
+
+\begin_layout Enumerate
+Using CTCS,
+ oscillations are generated where the initial conditions are discontinuous,
+ even when the Courant number is below one.
+ A solution is to use a spatial discretisation that takes information from upwind only,
+ not from downwind.
+ The first-order accurate,
+ forward in time,
+ backward in space (FTBS) scheme will always give smooth solutions for Courant numbers less than one (and for 
+\begin_inset Formula $u>0$
+\end_inset
+
+)
+\begin_inset Formula 
+\begin{equation}
+\theta_{j}^{(n+1)}=\theta_{j}^{(n)}-\frac{u\Delta t}{\Delta x}\left(\theta_{j}^{(n)}-\theta_{j-1}^{(n)}\right).
+\end{equation}
+
+\end_inset
+
+Code up FTBS and compare the solutions with CTCS.
 \end_layout
 
 \begin_layout Subsection
@@ -4924,7 +4955,8 @@ name "fig:CAMSE"
 \end_layout
 
 \begin_layout Standard
-The spectral element method enables arbitrarily high-order accuracy on a variety of meshes.
+The spectral element method enables arbitrarily high-order accuracy on a variety of meshes,
+ and is extremely efficient on massively parallel computers.
  Fourth-order accurate spectral elements are used in a version of NCAR Community Atmosphere Model,
  CAM-SE 
 \begin_inset CommandInset citation
@@ -5003,8 +5035,68 @@ literal "false"
  
 \end_layout
 
+\begin_layout Standard
+Spectral elements are continuous Galerkin methods.
+ This means that there is a level of continuity between elements and spectral elements are accurate when solutions are smooth.
+ The discretisation is symmetric – there is no account taken of which direction is upwind.
+ We learned in the exercise 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:Ex_CTCSadvection"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+ that symmetric discretisations lead to oscillatory solutions when advecting discontinuous fields,
+ whereas using upwind information to calculate gradients enables smooth solutions.
+ Spectral element methods instead rely on small amounts of diffusion to maintain stability and smooth solutions 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "GTU+14"
+literal "false"
+
+\end_inset
+
+.
+\end_layout
+
 \begin_layout Subsubsection
 Discontinuous Galerkin
+\end_layout
+
+\begin_layout Standard
+The discontinuous Galerkin (DG) method is similar to the spectral element method (a continuous Galerkin method),
+ but discontinuities are allowed between elements.
+ Like the finite volume method,
+ there are fluxes between elements,
+ leading to asymmetry,
+ and more upwind information than downwind is used in calculations.
+ DG can handle discontinuous fields without the need to introduce artificial diffusion,
+ but is is slightly more expensive.
+ The cost is offset by the excellent scaling properties on massively parallel computers.
+ DG is not currently being used operationally for weather prediction but powerful research models exist such as NUMA-NEPTUNE,
+ 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "KG12"
+literal "false"
+
+\end_inset
+
+ developed at the Naval Postgraduate School and DG-COSMO 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "SBB+14"
+literal "false"
+
+\end_inset
+
+,
+ a version of COSMO,
+ which is a limited area model that was used by Deutscher Wetterdienst before ICON was operational.
 \end_layout
 
 \begin_layout Subsubsection
@@ -5012,11 +5104,18 @@ Mixed Finite Elements
 \end_layout
 
 \begin_layout Standard
-SE and DG are co-located
+SE and DG are co-located.
+ This motivates mixed finite elements
 \end_layout
 
 \begin_layout Section
-Is AI the Future?
+Is Machine Learning the Future of Weather and Climate Prediction
+\end_layout
+
+\begin_layout Standard
+ML weather forecasts are great.
+ Current ML models drift and usually diverge to an unrealistic state within a few weeks.
+ Lots of work to do here.
 \end_layout
 
 \end_body
