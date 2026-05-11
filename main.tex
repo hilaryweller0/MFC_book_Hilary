@@ -7,14 +7,18 @@
 \usepackage[a4paper]{geometry}
 \geometry{verbose,tmargin=2.5cm,bmargin=2.5cm,lmargin=2.5cm,rmargin=2.5cm}
 \setcounter{secnumdepth}{3}
-\setcounter{tocdepth}{3}
+\setcounter{tocdepth}{5}
 \usepackage{color}
+\usepackage{babel}
 \usepackage{units}
-\usepackage{url}
 \usepackage{bm}
 \usepackage{amsmath}
 \usepackage{graphicx}
 \usepackage[authoryear,round]{natbib}
+\usepackage[pdfusetitle,
+ bookmarks=true,bookmarksnumbered=false,bookmarksopen=false,
+ breaklinks=false,pdfborder={0 0 1},backref=false,colorlinks=false]
+ {hyperref}
 
 \makeatletter
 
@@ -25,9 +29,11 @@
 \newcommand{\lyxdot}{.}
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% User specified LaTeX commands.
+\usepackage{todonotes}
+
 \makeatother
 
-\usepackage{babel}
 \begin{document}
 \tableofcontents{}
 

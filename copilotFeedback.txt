@@ -1,0 +1,148 @@
+I have written the attached, which is chapter 5 of a book "Mathematics for Our Future Climate" which is aimed at maths graduates embarking on a PhD. Please could I have some feedback
+Copilot said:
+Copilot
+Thank you for sharing this — it’s a substantial, thoughtful, and genuinely impressive chapter, and it’s very well pitched for maths graduates moving into atmospheric and climate modelling. I’ll structure my feedback so it’s maximally useful rather than overwhelming.
+
+I’ll focus on (1) strengths, (2) high‑level structure and narrative, (3) pedagogical effectiveness for the target audience, (4) technical clarity and accuracy, and (5) concrete, actionable suggestions.
+
+1. Major strengths (what is already working very well)
+✅ Clear intellectual arc
+The chapter has a strong through‑line:
+
+Fast waves → time‑step constraints → elliptic solves → grids → parallelism → modern discretisations
+
+That arc is exactly right for explaining why modern atmospheric numerics look the way they do. This is hard to do well, and you’ve done it.
+
+✅ Excellent historical grounding
+The Richardson → Charney → Arakawa → ECMWF narrative is:
+
+accurate,
+motivating,
+and extremely effective for students.
+You consistently explain why ideas emerged, not just what they are.
+
+✅ Exercises are outstanding
+The exercises are a real highlight:
+
+They are concept‑revealing, not rote.
+They expose numerical pathologies (computational modes, oscillations).
+They gently force students to confront CFL, staggering, and elliptic solves.
+This is exactly what PhD‑level training should do.
+
+✅ Tone: authoritative but approachable
+You strike a nice balance between:
+
+formal exposition, and
+informal explanations (“meteorologists love air parcels”, “treacle”).
+That’s rare and valuable.
+
+2. Structure & narrative flow (high‑level feedback)
+Overall structure is strong, but Chapter 1 is doing a lot. For a book chapter, that’s fine — but a few signposting tweaks would significantly improve readability.
+
+Suggested improvement: explicit “why this matters” signposts
+At the start of each major section, consider adding one sentence answering:
+
+Why does the reader need to care about this?
+
+For example:
+
+1.2 Taming Fast Waves
+Add a sentence like:
+
+Fast waves do not carry much meteorological information, but they dominate the numerical stability of weather models.
+
+1.4 The Pole Problem and Parallel Computing
+Explicitly say:
+
+This section explains why grid choice is now dictated as much by computer architecture as by numerical analysis.
+
+These are already implicit — making them explicit helps newer PhD students enormously.
+
+3. Pedagogical effectiveness for maths graduates
+You are aiming at maths graduates embarking on a PhD, and this is largely spot‑on. A few targeted adjustments could make it even stronger.
+
+✅ What works particularly well for mathematicians
+Clear PDE classification (hyperbolic vs elliptic)
+Variational and Galerkin language
+Emphasis on convergence and error norms
+Linking discretisation choices to functional spaces (implicitly)
+⚠️ Where some readers may struggle
+There are places where meteorological intuition is assumed. This is fine, but a sentence of translation would help.
+
+Examples:
+
+Geostrophic balance (1.32–1.34)
+Why gravity waves are “irrelevant” but also essential
+Why pressure is the “right” variable to think about
+You don’t need to explain the physics in depth — just flag what role it plays mathematically.
+
+4. Technical clarity & accuracy (minor points)
+Overall, the technical content is excellent and accurate. A few small notes:
+
+Minor clarifications
+In §1.2.2, when ellipticity appears “because acoustic waves are infinite speed”, it might help to say explicitly:
+
+This converts a time‑marching problem into a constraint problem.
+
+In §1.5.4 (Spectral Elements), you might explicitly state:
+
+Fourth‑order accuracy corresponds to polynomial degree 3 with GLL quadrature.
+
+You clearly know this — spelling it out helps students connect accuracy ↔ polynomial degree.
+
+Terminology consistency
+You occasionally alternate between:
+spectral element method
+spectral elements
+SE
+Not wrong, but picking one dominant term per section reduces cognitive load.
+
+5. Specific suggestions that would noticeably improve the chapter
+Here are concrete, low‑effort, high‑impact suggestions.
+
+1. Add a short “roadmap” paragraph at the start of the chapter
+Something like:
+
+This chapter explains why weather and climate models use the numerical methods they do. We begin with early finite‑difference approaches and the problem of fast waves, then show how elliptic solves, grid staggering, and semi‑implicit methods emerged. We then turn to modern challenges: parallel computing, quasi‑uniform spherical meshes, and high‑order methods such as spectral elements and discontinuous Galerkin.
+
+This helps students orient themselves.
+
+2. Slightly sharpen the SEM vs DG contrast
+Your §1.5.4 and §1.5.5 are good, but one explicit comparison sentence would help:
+
+Spectral elements prioritise accuracy per degree of freedom for smooth fields, whereas DG prioritises locality, robustness, and scalability at the cost of additional degrees of freedom.
+
+This reinforces conceptual distinctions.
+
+3. Consider a short “Key Takeaways” box at the end of §1.5
+Even 5 bullet points:
+
+Fast waves impose severe stability constraints.
+Semi‑implicit and elliptic solves remove these constraints.
+Grid staggering controls computational modes.
+Latitude–longitude grids do not scale to exascale computing.
+High‑order methods on quasi‑uniform meshes are the future.
+This would be hugely appreciated by students.
+
+Overall verdict
+This chapter is:
+
+Technically authoritative
+Pedagogically thoughtful
+Well‑written and engaging
+Exactly the right level for incoming PhD students
+With a few extra signposts and occasional “translation” sentences for mathematicians new to geophysics, it would be exceptional.
+
+If you’d like, next I could:
+
+do a line‑level pedagogical edit of one section (e.g. Taming Fast Waves),
+suggest figures that would add the most value, or
+help align the chapter even more tightly with the book’s overall theme “Mathematics for Our Future Climate”.
+
+
+
+
+
+
+
+
