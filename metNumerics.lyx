@@ -262,7 +262,7 @@ which represents the rate of change of
 \end_inset
 
 .
- Advection the movement by the wind.
+ Advection is movement by the wind.
  The potential temperature is a wonderful meteorological concept
 \begin_inset Formula 
 \begin{equation}
@@ -290,24 +290,21 @@ where
 \end_inset
 
  is the specific heat capacity at constant pressure.
- It is the temperature that an air parcel would reach (meteorologists love air parcels),
- if it were brought adiabatically to 1000
+ It is the temperature that an air parcel would reach if it were brought adiabatically to 1000
 \begin_inset space ~
 \end_inset
 
-hPa.
- That is,
- a small volume of air in the upper atmosphere is brought down to near the ground,
- while contracting as the pressure increases,
- without any other exchanges of energy between the air parcel and its surroundings,
- so it heats up as it descends,
- but its potential temperature,
+hPa (meteorologists love air parcels).
+ So if a volume of air near the ground rises,
+ while expanding as the pressure falls,
+ it will cool (assuming no other exchanges of energy between the air parcel and its surroundings).
+ However its potential temperature,
  
 \begin_inset Formula $\theta$
 \end_inset
 
 ,
- remains the same.
+ will remain the same.
  One of the wonderful aspects of potential temperature is that its transport equation (
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -322,9 +319,9 @@ nolink "false"
 ),
  unlike that of temperature,
  does not contain a pressure work term,
- that describes how temperature changes when the air expands or contracts,
- which can make the equations more difficult to solve.
- Another joy of potential temperature is that it informative about the stability of the atmosphere.
+ that describes how temperature changes when the air expands or contracts.
+ The pressure work term can make the equation set more difficult to solve.
+ Another joy of potential temperature is that it is informative about the stability of the atmosphere.
  Temperature always decreases with height in the troposphere (below the stratosphere).
  But potential temperature usually increases or is constant.
  If potential temperature is ever found to decrease with height then the atmosphere will be unstable,
@@ -404,7 +401,7 @@ The equations that Richardson solved were more complex;
  and he made the excellent hydrostatic assumption
 \begin_inset Formula 
 \begin{equation}
-\frac{\partial p}{\partial z}=-\rho g
+\frac{\partial p}{\partial z}=-\rho g\label{eq:hydrostatic}
 \end{equation}
 
 \end_inset
@@ -446,7 +443,18 @@ where
 \noun default
 \color inherit
 .
- This can be used,
+ Eqn (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:hydrostatic"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) can be used,
  with the continuity equation (
 \begin_inset CommandInset ref
 LatexCommand ref
