@@ -1,0 +1,155 @@
+2. The main structural issue: the chapter is still too encyclopaedic
+This is the single biggest remaining issue — and it’s a good problem to have.
+The problem
+The chapter sometimes slips from:
+
+“Here is the story of how numerical weather prediction evolved”
+
+into:
+
+“Here is a compact review article of 60 years of atmospheric numerics.”
+
+For a review paper, that’s fine.
+For a book chapter aimed at incoming PhD students, it can overwhelm.
+The consequence
+Some readers will:
+
+lose the hierarchy of ideas,
+struggle to remember what mattered most,
+confuse “important historically” with “important today”.
+
+
+3. The key conceptual distinction to sharpen
+If I had to summarise the chapter’s implicit thesis, it is:
+
+Weather and climate numerics are dominated by constraints that come from fast waves, geometry, and computers — not from the slow physics we care about.
+
+That thesis is present everywhere — but not always foregrounded.
+Suggestion: make constraints explicit
+When introducing any method, grid, or discretisation, consider explicitly stating:
+
+What constraint it addresses
+What new constraint it introduces
+
+For example:
+
+
+Semi‑implicit methods
+→ remove fast‑wave time‑step limits
+→ introduce elliptic solves
+
+
+Latitude–longitude grids
+→ simple numerics
+→ destroy parallel scalability
+
+
+Spectral methods
+→ maximal accuracy per DOF
+→ global communication
+
+
+Right now, the reader often has to infer this themselves. Making it explicit would greatly strengthen the chapter.
+
+4. Section‑by‑section constructive criticism
+4.1 Early sections (Richardson → Charney)
+These are very strong, but I’d suggest slightly more signposting for mathematicians.
+Example improvement:
+
+“Richardson classified weather prediction as a ‘marching’ problem…”
+
+You could add:
+
+In modern PDE terms, he correctly identified the equations as hyperbolic — but underestimated the numerical consequences of fast characteristic speeds.
+
+That single sentence bridges disciplines beautifully.
+
+4.2 Taming Fast Waves (the conceptual heart)
+This is one of the strongest sections, but it could be even sharper.
+What works
+
+Excellent choice of shallow‑water example
+Clear link between wave speed and CFL
+Exercises that force understanding, not memorisation
+
+What could improve
+At the end of this section, explicitly state:
+
+Fast waves are not eliminated because they are unphysical, but because they dominate numerical stability while contributing little to forecast skill.
+
+That sentence would crystallise the entire section.
+
+4.3 Arakawa grids
+This is technically excellent — but dense.
+Suggestion
+Add a one‑paragraph executive summary at the start:
+
+Arakawa grids are best understood as different compromises between accurate wave propagation, avoidance of computational modes, and accurate Coriolis coupling.
+
+Then the detailed discussion feels guided rather than exhaustive.
+
+4.4 Spectral method section
+This section is very clear mathematically — perhaps too comfortable for maths graduates.
+Constructive critique
+You might consider:
+
+briefly flagging aliasing and non‑locality as the two main numerical issues,
+even if you don’t fully treat them.
+
+That signals awareness of real‑world complications without adding bulk.
+
+4.5 Meshes of the sphere and parallelism
+This is one of the best parts of the chapter.
+If anything, I’d encourage you to be more opinionated here. For example:
+
+At modern resolutions, latitude–longitude grids are not merely inefficient — they are a fundamental barrier to scalability.
+
+That’s defensible, and students appreciate clarity.
+
+4.6 SEM vs DG
+This comparison is good but could be crisper.
+Right now it’s descriptive; it could be more decisive.
+A suggested contrast sentence:
+
+Spectral elements maximise accuracy for smooth, balanced flows, while discontinuous Galerkin methods prioritise robustness, locality, and scalability in the presence of sharp gradients.
+
+This helps students remember why both exist.
+
+5. Style and pacing: small but important points
+✅ What to keep
+
+Occasional informal phrasing (“treacle”, “heroic”)
+Historical anecdotes
+Explicit references to real models (ECMWF, ICON, CAM)
+
+⚠️ What to trim
+
+Repeated reminders of facts already established (e.g. CFL limits)
+Some derivations could be shortened with “details omitted” signposts
+
+
+6. One high‑impact addition I strongly recommend
+Add a “What should you remember?” box at the end
+Something like:
+
+Key messages from this chapter
+
+Fast waves dominate numerical stability, not forecast skill.
+Numerical weather prediction evolved to manage constraints, not elegance.
+Grid staggering controls computational modes.
+Modern models are shaped by parallel computing as much as mathematics.
+High‑order methods on quasi‑uniform meshes are the current frontier.
+
+
+This would hugely benefit PhD readers.
+
+Final verdict
+This draft is now clearly publishable‑quality, and with a few structural and rhetorical refinements, it will be exceptional.
+What you are doing particularly well — and this is rare — is teaching judgement, not just methods. That’s exactly what early‑stage PhD students need.
+If you’d like, next steps could be:
+
+a line‑by‑line edit of one key section (e.g. Taming Fast Waves),
+help writing a short chapter introduction or conclusion,
+or advice on what to cut if page limits bite.
+
+You’re very much in the polishing phase now — and that’s a great place to be.

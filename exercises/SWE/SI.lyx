@@ -4,10 +4,7 @@
 \begin_header
 \save_transient_properties true
 \origin unavailable
-\textclass book
-\begin_preamble
-\usepackage{todonotes}
-\end_preamble
+\textclass article
 \use_default_options true
 \maintain_unincluded_children no
 \language british
@@ -37,16 +34,7 @@
 \float_alignment class
 \paperfontsize 12
 \spacing single
-\use_hyperref true
-\pdf_bookmarks true
-\pdf_bookmarksnumbered false
-\pdf_bookmarksopen false
-\pdf_bookmarksopenlevel 1
-\pdf_breaklinks false
-\pdf_pdfborder false
-\pdf_colorlinks false
-\pdf_backref false
-\pdf_pdfusetitle true
+\use_hyperref false
 \papersize a4
 \use_geometry true
 \use_package amsmath 1
@@ -59,10 +47,9 @@
 \use_package stackrel 1
 \use_package stmaryrd 1
 \use_package undertilde 1
-\cite_engine natbib
-\cite_engine_type authoryear
-\biblio_style abbrvnat
-\biblio_options round
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
 \use_bibtopic false
 \use_indices false
 \paperorientation portrait
@@ -81,12 +68,12 @@
 \rightmargin 2.5cm
 \bottommargin 2.5cm
 \secnumdepth 3
-\tocdepth 5
+\tocdepth 3
 \paragraph_separation indent
 \paragraph_indentation default
 \is_math_indent 0
 \math_numbering_side default
-\quotes_style english
+\quotes_style british
 \dynamic_quotes 0
 \papercolumns 1
 \papersides 1
@@ -106,48 +93,20 @@
 \begin_body
 
 \begin_layout Standard
-\begin_inset CommandInset toc
-LatexCommand tableofcontents
-
-\end_inset
-
-
+Semi-implicit,
+ staggered solution of the SWE.
+ Starting with linearised
 \end_layout
 
 \begin_layout Standard
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-setcounter{chapter}{4}
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset include
-LatexCommand input
-filename "metNumerics.lyx"
-literal "false"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset bibtex
-LatexCommand bibtex
-btprint "btPrintCited"
-bibfiles "numerics"
-options "abbrvnat"
-encoding "default"
+\begin_inset Formula 
+\begin{align}
+u_{j+1/2}^{(n+1)} & =u_{j+1/2}^{(n)}-\frac{\Delta t\ g}{\Delta x}\left(h_{j+1}^{(n+1)}-h_{j}^{(n+1)}\right)\label{eq:linSWh_FB_C}\\
+h_{j}^{(n+1)} & =h_{j}^{(n)}-\frac{\Delta t\ H}{\Delta x}\left(u_{j+1/2}^{(n+1)}-u_{j-1/2}^{(n+1)}\right)\label{eq:linSWu_FB_C}\\
+\implies h_{j}^{(n+1)} & =h_{j}^{(n)}-\frac{\Delta t\ H}{\Delta x}\left(u_{j+1/2}^{(n)}-u_{j-1/2}^{(n)}\right)+c_{g}^{2}\left(h_{j+1}^{(n+1)}-2h_{j}^{(n+1)}+h_{j-1}^{(n+1)}\right)\\
+\text{where} & c_{g}=\frac{\sqrt{gH}\Delta t}{\Delta x}\\
+\implies-c_{g}^{2}h_{j-1}^{(n+1)} & +\left(1+2c_{g}^{2}\right)h_{j}^{(n+1)}-c_{g}^{2}h_{j+1}^{(n+1)}=h_{j}^{(n)}-\frac{\Delta t\ H}{\Delta x}\left(u_{j+1/2}^{(n)}-u_{j-1/2}^{(n)}\right)
+\end{align}
 
 \end_inset
 

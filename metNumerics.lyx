@@ -159,11 +159,14 @@ Meteorology is the science of weather and climate.
  temperature,
  pressure and the moisture content of the atmosphere.
  This chapter explains why weather and climate models use the numerical methods they do.
+ Weather and climate models have constraints from fast waves in the atmosphere,
+ from the geometry of the planet,
+ from the computers that we use and from the delicate balances of atmospheric motion.
  We begin with early finite\SpecialChar nobreakdash
 difference approaches and the problem of fast waves,
  then show how elliptic solves,
  grid staggering,
- and semi\SpecialChar nobreakdash
+ spectral methods and semi\SpecialChar nobreakdash
 implicit methods emerged.
  We then turn to modern challenges:
  parallel computing,
@@ -171,6 +174,9 @@ implicit methods emerged.
 uniform spherical meshes,
  and high\SpecialChar nobreakdash
 order methods such as spectral elements and discontinuous Galerkin.
+ The most important take away message is that no numerical method is perfect,
+ but the numerical models are useful.
+ 
 \end_layout
 
 \begin_layout Section
@@ -180,7 +186,7 @@ The Early Days of Numerical Weather Prediction
 \begin_layout Subsection
 L.
  F.
- Richardson's First Forecast
+ Richardson's First Forecast and the Primitive Equations 
 \end_layout
 
 \begin_layout Standard
@@ -261,9 +267,15 @@ which represents the rate of change of
 \begin_inset Formula $\partial\phi/\partial t$
 \end_inset
 
-.
- Advection is movement by the wind.
- The potential temperature is a wonderful meteorological concept
+,
+ advection being movement by the wind.
+ The potential temperature,
+ 
+\begin_inset Formula $\theta$
+\end_inset
+
+,
+ is a wonderful meteorological concept
 \begin_inset Formula 
 \begin{equation}
 \theta=T\left(p_{0}/p\right)^{R/c_{p}}
@@ -290,15 +302,19 @@ where
 \end_inset
 
  is the specific heat capacity at constant pressure.
- It is the temperature that an air parcel would reach if it were brought adiabatically to 1000
+ 
+\begin_inset Formula $\theta$
+\end_inset
+
+ is the temperature that an air parcel would reach if it were brought adiabatically to 1000
 \begin_inset space ~
 \end_inset
 
 hPa (meteorologists love air parcels).
- So if a volume of air near the ground rises,
+ If a volume of air near the ground rises,
  while expanding as the pressure falls,
- it will cool (assuming no other exchanges of energy between the air parcel and its surroundings).
- However its potential temperature,
+ it will cool (assuming no other exchanges of energy between the air parcel and its surroundings),
+ but its potential temperature,
  
 \begin_inset Formula $\theta$
 \end_inset
@@ -498,7 +514,8 @@ marching
 \begin_inset Quotes erd
 \end_inset
 
- problem (or hyperbolic),
+ problem (or hyperbolic,
+ in PDE terms),
  with information propagating from the initial conditions and from the boundaries,
  as opposed to a 
 \begin_inset Quotes eld
@@ -519,9 +536,12 @@ jurymen
 
  sitting at the boundary must all agree simultaneously on then solution (elliptic).
  This classification was correct,
- but the information propagates so quickly,
- in the form of gravity waves,
- that we need to use numerical methods for solving elliptic problems (including simultaneous solutions in different locations) for solving the primitive equations.
+ but the fast characteristic speeds of gravity waves,
+ means that numerical methods for solving elliptic problems are beneficial for solving the primitive equations.
+\end_layout
+
+\begin_layout Subsection
+Finite Differences
 \end_layout
 
 \begin_layout Standard
@@ -700,8 +720,8 @@ literal "false"
  described a few alternatives for what to do at the very first time step,
  when you do not know values from two previous time levels,
  only one.
- This cost effective scheme is not used much as it generates solutions with oscillations.
- This is worth trying ...
+ This cost effective scheme is not used much anymore as it generates solutions with oscillations,
+ which will be demonstrated in the following exercise.
 \end_layout
 
 \begin_layout Subsection
@@ -759,7 +779,21 @@ nolink "false"
 
 \end_inset
 
-The Courant number is
+Instead of having variables for 
+\begin_inset Formula $u$
+\end_inset
+
+,
+ 
+\begin_inset Formula $\Delta t$
+\end_inset
+
+ and 
+\begin_inset Formula $\Delta x$
+\end_inset
+
+ in your code,
+ you can substitute in the Courant number:
 \begin_inset Formula 
 \begin{equation}
 c=\frac{u\Delta t}{\Delta x}.\label{eq:Courant}
@@ -784,14 +818,15 @@ Set the Courant number to be 0.4 and run for 10 time steps.
 \end_layout
 
 \begin_layout Enumerate
-Can you animate the solution?
+Plot the solution at a few consecutive time steps.
  What can you say about the part of the solution that started from the smooth initial conditions?
  What do the discontinuities do to the solution?
  Why?
 \end_layout
 
 \begin_layout Enumerate
-Next try setting the Courant number to be 1.1 and animate the solution for 5 time steps.
+Next try setting the Courant number to be 1.1 and plot the solution after 3,
+ 4 and 5 time steps.
  What is happening now?
  Why?
 \end_layout
@@ -817,6 +852,14 @@ Using CTCS,
 \end_inset
 
 Code up FTBS and compare the solutions with CTCS.
+\end_layout
+
+\begin_layout Standard
+The solutions of this exercise fit with the key take away message is that no numerical method is perfect,
+ but the numerical models are useful.
+ CTCS is more accurate than FTBS but the solutions can contain oscillations,
+ which are not generated by FTBS.
+ Both schemes are chap but unstable for Courant numbers greater than one.
 \end_layout
 
 \begin_layout Section
@@ -887,7 +930,7 @@ nolink "false"
 \end_inset
 
 which filters out acoustic waves.
- This is not useful for weather prediction for two reasons because air density varies by orders of magnitude between the surface and the stratosphere.
+ This is not useful for weather prediction because air density varies by orders of magnitude between the surface and the stratosphere.
  Also,
  numerical solutions including (
 \begin_inset CommandInset ref
@@ -928,7 +971,7 @@ nolink "false"
 \end_inset
 
 ).
- The wave acoustic wave speed has actually been made infitite!
+ The acoustic wave speed has actually been made infitite!
  Charney's solution will be described in section 
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -947,7 +990,7 @@ nolink "false"
 
 \begin_layout Subsection
 Example:
- Numerical Solution of Gravity Waves
+ Numerical Solution of the Shallow Water Equations
 \begin_inset CommandInset label
 LatexCommand label
 name "subsec:solveSW"
@@ -958,7 +1001,7 @@ name "subsec:solveSW"
 \end_layout
 
 \begin_layout Standard
-The primitive equations can be simplified and averaged in the vertical to produce the shallow-water equations:
+The primitive equations can be simplified and averaged in the vertical to produce the shallow water equations:
 \begin_inset Formula 
 \begin{align}
 \frac{D\mathbf{u}}{Dt}+2\bm{\Omega}\times\mathbf{u} & =-g\nabla h\label{eq:SWu_vec}\\
@@ -1014,7 +1057,15 @@ where the Coriolis parameter,
 \begin_inset Formula $u,v,h$
 \end_inset
 
- are assumed small.
+ are assumed small so that 
+\begin_inset Formula $D/Dt$
+\end_inset
+
+ is replaced by 
+\begin_inset Formula $\partial/\partial t$
+\end_inset
+
+.
  Just considering one spatial dimension and ignoring rotation (
 \begin_inset Formula $f=0$
 \end_inset
@@ -1223,23 +1274,15 @@ literal "false"
 \end_inset
 
 .
- 
+ Could this have been part of the problem with his forecast?
 \end_layout
 
-\begin_layout Subsubsection*
-Exercises
-\end_layout
-
-\begin_layout Standard
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-addcontentsline{toc}{subsubsection}{Exercises}
-\end_layout
+\begin_layout Subsubsection
+Exercises:
+ Numerical Solution of the Linearised Shallow Water Equations
+\begin_inset CommandInset label
+LatexCommand label
+name "ex:explicitSWE"
 
 \end_inset
 
@@ -1261,7 +1304,7 @@ Work out what time step Richardson would have needed to treat gravity waves stab
 \end_layout
 
 \begin_layout Enumerate
-Write code to solve the one-dimensional linearised shallow-water equations using the forward-backward time-stepping on a staggered grid (
+Write code to solve the one-dimensional linearised shallow water equations using the forward-backward time-stepping on a staggered grid (
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "eq:linSWh_FB_C"
@@ -1302,7 +1345,16 @@ u\left(x,t=0\right),\  & h\left(x,t=0\right)=\begin{cases}
 
 \end_inset
 
-Animate the results for 5 time steps using Richardson's time step of 6
+The easiest way to implement periodic boundary conditions is to define data at 
+\begin_inset Formula $x=0$
+\end_inset
+
+ but not at 
+\begin_inset Formula $x=L$
+\end_inset
+
+ and use modulo arithmetic for index locations.
+ Animate the results for 5 time steps using Richardson's time step of 6
 \begin_inset space ~
 \end_inset
 
@@ -1375,7 +1427,7 @@ Double the number of grid points and time steps (so that the Courant number stay
 
 \end_deeper
 \begin_layout Enumerate
-Write code to solve the shallow-water equations a co-located method (without grid-staggering),
+Write code to solve the shallow water equations with a co-located method (without grid-staggering),
  with 
 \begin_inset Formula $h_{j}$
 \end_inset
@@ -1479,7 +1531,7 @@ nolink "false"
 
 \end_inset
 
-) and the shallow-water equations (
+) and the shallow water equations (
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "eq:SWu_vec"
@@ -1505,7 +1557,7 @@ nolink "false"
  meaning that information propagates at a finite speed.
  This encouraged Richardson in developing an explicit time-stepping method.
  However,
- the propagation speeds are so fast that we actually need a numerical method similar to a numerical method for solving an elliptic equation.
+ the characteristic speeds are so fast that we actually need a numerical method similar to one for solving an elliptic equation.
  By making the incompressible approximation (
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -1529,8 +1581,7 @@ literal "false"
 
 \end_inset
 
- derived an elliptic vorticity equation to represent some slowly evolving weather regimes.
- This was an equation for the vertical component of the total vorticity:
+ derived an elliptic vorticity equation to predict the vertical component of the total vorticity:
 \begin_inset Formula 
 \begin{equation}
 \eta=\xi+f\label{eq:pv}
@@ -1550,6 +1601,7 @@ where
 
 ,
  is the planetary vorticity.
+ Vorticity equations can represent slowly evolving weather regimes.
  To derive the barotropic vorticity equation,
  we assume incompressibility and take the curl of the momentum equation (
 \begin_inset CommandInset ref
@@ -1573,18 +1625,8 @@ nolink "false"
 
 (see the mathematical exercises below).
  This seems wonderfully simple!
- The difficult bit comes is calculating the velocity from the vorticity by inverting (
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "eq:pv"
-plural "false"
-caps "false"
-noprefix "false"
-nolink "false"
-
-\end_inset
-
-) which is exactly the kind of 
+ The difficult bit comes is calculating the velocity from the vorticity,
+ which is exactly the kind of 
 \begin_inset Quotes eld
 \end_inset
 
@@ -1630,8 +1672,8 @@ u\approx-\frac{1}{\rho f}\frac{\partial p}{\partial y},\ \  & v\approx\frac{1}{\
 
 Therefore the wind flows anti-clockwise,
  or cyclonically,
- around low pressure in the Northern hemisphere and clockwise around anti-cyclones in the Northern hemisphere.
- The winds advect (move) the pressure,
+ around low pressure in the Northern hemisphere and clockwise around anti-cyclones.
+ The winds advect the pressure,
  making it evolve slowly,
  making the weather predictable.
  However geostrophic balance cannot be used to predict the weather.
@@ -1680,15 +1722,7 @@ entirely irrelevant gravity motions
 \begin_inset Quotes erd
 \end_inset
 
- 
-\begin_inset CommandInset citation
-LatexCommand citet
-key "Char49"
-literal "false"
-
-\end_inset
-
-.
+ without assuming incompressibility or exact geostrophic balance.
  
 \begin_inset CommandInset citation
 LatexCommand citet
@@ -1757,8 +1791,15 @@ where
 \end_inset
 
  is the horizontal component of the wind.
- Hence the two equations to be solved,
- for total vorticity,
+ Hence the two equations to be solved for the simplest weather prediction are
+\begin_inset Formula 
+\begin{align}
+\frac{D\eta}{Dt} & =0, & g\nabla\cdot\frac{1}{f}\nabla z & =\xi\label{eq:baroVortGeoVort}
+\end{align}
+
+\end_inset
+
+to predict total vorticity,
  
 \begin_inset Formula $\eta$
 \end_inset
@@ -1769,36 +1810,15 @@ where
 \begin_inset Formula $z$
 \end_inset
 
-,
- for the simplest weather prediction are
-\begin_inset Formula 
-\begin{align}
-\frac{D\eta}{Dt} & =0, & g\nabla\cdot\frac{1}{f}\nabla z & =\xi.\label{eq:baroVortGeoVort}
-\end{align}
-
-\end_inset
-
-
+.
+ In these equations the fast wave are eliminated,
+ not because they are irrelevant,
+ but because they can dominate numerical stability while contributing little to large scale weather patterns.
 \end_layout
 
-\begin_layout Subsubsection*
-Mathematical Exercises
-\end_layout
-
-\begin_layout Standard
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-addcontentsline{toc}{subsubsection}{Mathematical Exercises}
-\end_layout
-
-\end_inset
-
-
+\begin_layout Subsubsection
+Mathematical Exercises:
+ Vorticity Equations and Geostrophic Balance
 \end_layout
 
 \begin_layout Enumerate
@@ -2015,24 +2035,9 @@ g\nabla\cdot\frac{1}{f}\nabla z=\xi.
 
 \end_layout
 
-\begin_layout Subsubsection*
-Coding Exercise
-\end_layout
-
-\begin_layout Standard
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-addcontentsline{toc}{subsubsection}{Coding Exercise}
-\end_layout
-
-\end_inset
-
-
+\begin_layout Subsubsection
+Coding Exercise:
+ Vorticity Inversion
 \end_layout
 
 \begin_layout Standard
@@ -2123,8 +2128,7 @@ nolink "false"
 \end_inset
 
 ).
- The real atmosphere is,
- of course fully compressible,
+ The real atmosphere is compressible,
  with finite speed acoustic and gravity waves and non-hydrostatic motions,
  so for the most accurate weather forecasts,
  all of these processes need to be included,
@@ -2135,13 +2139,14 @@ nolink "false"
  so that the simplified,
  linear parts can be solved implicitly,
  leaving the corrections,
- which may be non-linear or just other slow terms,
+ which may be non-linear,
+ or just other slow terms,
  to be solved explicitly.
  
 \end_layout
 
 \begin_layout Standard
-We can solve the non-linear shallow-water equations (
+We can solve the non-linear shallow water equations (
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "eq:SWu_vec"
@@ -2334,20 +2339,12 @@ nolink "false"
 .
 \end_layout
 
-\begin_layout Subsubsection*
-Exercise
-\end_layout
-
-\begin_layout Standard
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-addcontentsline{toc}{subsubsection}{Exercise}
-\end_layout
+\begin_layout Subsubsection
+Exercise:
+ Semi-implicit Solution of the Shallow Water Equations
+\begin_inset CommandInset label
+LatexCommand label
+name "ex:SI_SWE"
 
 \end_inset
 
@@ -2355,7 +2352,18 @@ addcontentsline{toc}{subsubsection}{Exercise}
 \end_layout
 
 \begin_layout Standard
-We will assume a one-dimensional staggered grid (eqns 
+This exercise builds on the code written in exercise 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "ex:explicitSWE"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+ to solve the linearised shallow water equations (
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "eq:linSWu"
@@ -2366,7 +2374,7 @@ nolink "false"
 
 \end_inset
 
-,
+-
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "eq:linSWh"
@@ -2377,9 +2385,315 @@ nolink "false"
 
 \end_inset
 
-),
- without rotation.
- So the continuous equations are
+) explicitly,
+ which led to time step restrictions.
+ The first task is to solve the linearise,
+ one-dimensional equations implicitly,
+ then to add the non-linear terms and solve semi-implicitl#y.
+ 
+\end_layout
+
+\begin_layout Enumerate
+The explicit solution of the shallow water equations on a staggered grid is in eqns (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:linSWh_FB_C"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:linSWu_FB_C"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+).
+ This will be converted to an implicit method by replacing 
+\begin_inset Formula $u^{(n)}$
+\end_inset
+
+ with 
+\begin_inset Formula $u^{(n+1)}$
+\end_inset
+
+ on the right hand side of (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:linSWh_FB_C"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+).
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+Re-write eqn (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:linSWu_FB_C"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) with just 
+\begin_inset Formula $u_{j+1/2_{1}}^{(n+1)}$
+\end_inset
+
+ on the left.
+\end_layout
+
+\begin_layout Enumerate
+Re-write eqn (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:linSWh_FB_C"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+) with just 
+\begin_inset Formula $h_{j}^{(n+1)}$
+\end_inset
+
+ on the left and 
+\begin_inset Formula $h_{j}^{(n)}$
+\end_inset
+
+ and 
+\begin_inset Formula $u_{j\pm1/2}^{(n+1)}$
+\end_inset
+
+ on the right.
+\end_layout
+
+\begin_layout Enumerate
+Substitute the equation for 
+\begin_inset Formula $u_{j+1/2_{1}}^{(n+1)}$
+\end_inset
+
+ into the equation for 
+\begin_inset Formula $h_{j}^{(n+1)}$
+\end_inset
+
+ .
+ Rearrange to get terms involving just 
+\begin_inset Formula $h^{(n+1)}$
+\end_inset
+
+ on the left and terms at time 
+\begin_inset Formula $n$
+\end_inset
+
+ on the right.
+ Write this in terms of the gravity wave Courant number,
+ 
+\begin_inset Formula 
+\begin{equation}
+c_{g}=\frac{\sqrt{gH}\Delta t}{\Delta x}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+This can now be expressed as a matrix equation for the vector of all values of 
+\begin_inset Formula $h^{(n+1)}$
+\end_inset
+
+.
+ Work out the matrix coefficients,
+ 
+\begin_inset Formula $a_{ij}$
+\end_inset
+
+,
+ for row 
+\begin_inset Formula $j$
+\end_inset
+
+.
+ Of these,
+ 
+\begin_inset Formula $a_{j-1,j}$
+\end_inset
+
+,
+ 
+\begin_inset Formula $a_{j,j}$
+\end_inset
+
+ and 
+\begin_inset Formula $a_{j+1,j}$
+\end_inset
+
+ will be non-zero.
+ Assume periodic boundary conditions so that the matrix also has non-zero coefficients in the top right and bottom left corners.
+ Write code to create this matrix.
+\end_layout
+
+\begin_layout Enumerate
+Write code to calculate an array for the right hand side of the matrix equation.
+ 
+\end_layout
+
+\begin_layout Enumerate
+In your staggered grid code for exercise 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "ex:explicitSWE"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+,
+ instead of updating 
+\begin_inset Formula $h$
+\end_inset
+
+ explicitly,
+ write some code something like:
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+# At the top of the file:
+\end_layout
+
+\begin_layout Plain Layout
+
+import numpy.linalg as la
+\end_layout
+
+\begin_layout Plain Layout
+
+...
+\end_layout
+
+\begin_layout Plain Layout
+
+# The same initialisation as the previous code
+\end_layout
+
+\begin_layout Plain Layout
+
+...
+\end_layout
+
+\begin_layout Plain Layout
+
+cg = np.sqrt(g*H)*dt/dx      # Gravity wave Courant number
+\end_layout
+
+\begin_layout Plain Layout
+
+...
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+# Define the nx by nx matrix
+\end_layout
+
+\begin_layout Plain Layout
+
+A = np.zeros([nx,nx])
+\end_layout
+
+\begin_layout Plain Layout
+
+for j in range(nx):
+\end_layout
+
+\begin_layout Plain Layout
+
+   A[(j-1)%nx,j] = -cg**2
+\end_layout
+
+\begin_layout Plain Layout
+
+   A[j,j] = 1 + 2*cg**2
+\end_layout
+
+\begin_layout Plain Layout
+
+   A[(j+1)%nx,j] = -cg**2
+\end_layout
+
+\begin_layout Plain Layout
+
+...
+\end_layout
+
+\begin_layout Plain Layout
+
+# Inside the time loop
+\end_layout
+
+\begin_layout Plain Layout
+
+   RHS = h - dt*H/dx*(.....
+  # RHS of the matrix equation
+\end_layout
+
+\begin_layout Plain Layout
+
+   h = la.solve(A,
+ RHS)      # Solve the pressure eqauation for h
+\end_layout
+
+\begin_layout Plain Layout
+
+   u -= dt*g/dx*(...
+         # Update u using the new h
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Test your implicit code by running the same test cases as you ran for the explicit code.
+ The solutions should be similar for gravity wave Courant numbers less than one and stable for larger gravity wave Courant numbers.
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+This code can now be extended to solve the non-linear,
+ one-dimensional shallow water equations with a staggered grid.
+ These equations are
 \begin_inset Formula 
 \begin{align*}
 \frac{\partial u}{\partial t}+u\frac{\partial u}{\partial x} & =-g\frac{\partial h}{\partial x}\\
@@ -2391,9 +2705,10 @@ nolink "false"
 
 \end_layout
 
+\begin_deeper
 \begin_layout Enumerate
-Write the semi-implicit method,
- (
+Start by writing down the semi-implicit method for these equations,
+ following the mehod in eqns (
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "eq:backS"
@@ -2415,11 +2730,11 @@ nolink "false"
 
 \end_inset
 
-) for this one-dimensional system.
+).
 \end_layout
 
 \begin_layout Enumerate
-We will also assume that 
+We will assume that 
 \begin_inset Formula $u>0$
 \end_inset
 
@@ -2475,19 +2790,7 @@ nolink "false"
 \end_layout
 
 \begin_layout Enumerate
-Using grid-staggering as in (
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "eq:linSWh_FB_C"
-plural "false"
-caps "false"
-noprefix "false"
-nolink "false"
-
-\end_inset
-
-),
- write down the approximation for the term 
+Write down the approximation for the term 
 \begin_inset Formula $h\frac{\partial u^{\prime}}{\partial x}$
 \end_inset
 
@@ -2498,31 +2801,81 @@ nolink "false"
 .
 \end_layout
 
+\begin_layout Enumerate
+Work out the matrix coefficients for the matrix equation.
+ Gravity wave speeds will no longer be uniform,
+ so it may not be helpful to define these coefficients in terms of 
+\begin_inset Formula $c_{g}$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Enumerate
+Code up a non-linear shallow water equation solver.
+\end_layout
+
+\begin_layout Enumerate
+Start by testing the code using the same parameters as before but adding a constant to all of the values of 
+\begin_inset Formula $u$
+\end_inset
+
+ so that they never go negative.
+ Once this is working,
+ modify your upwind discretisation so that it uses forward in space (rather than backward in space) wherever 
+\begin_inset Formula $u<0$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Enumerate
+Test the code using asymptotics:
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+Use coefficients that give a large gravity wave Courant number and a small Courant number.
+ This will make the equations behave close to the linear system.
+ Check that,
+ as you reduce the ratio of Courant number to gravity wave Courant number,
+ the results become more and more similar to the linearised solver.
+ 
+\end_layout
+
+\begin_layout Enumerate
+Set 
+\begin_inset Formula $g$
+\end_inset
+
+ to zero.
+ Then,
+ initialising with 
+\begin_inset Formula $u=1$
+\end_inset
+
+ everywhere will mean that the height equation should give identical results to the linear advection equation solved using FTBS.
+ Altenatively,
+ initilising with uniform 
+\begin_inset Formula $h$
+\end_inset
+
+ will mean that the 
+\begin_inset Formula $u$
+\end_inset
+
+ equation becomes Burger's equation,
+ and the results should be identical to a solution of Burger's equation solved with FTBS.
+ 
+\end_layout
+
+\end_deeper
+\end_deeper
 \begin_layout Standard
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-todo[inline]{
-\end_layout
-
-\end_inset
-
-Maybe just use implicit to solve the linearised eqns and compare with previous exercise?
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\end_inset
-
-
+The key take away from this section is that semi-implicit methods remove fast wave time step limits,
+ but the solutions may be less accurate and large linear equation solvers are needed,
+ which can be expensive.
 \end_layout
 
 \begin_layout Section
@@ -2552,13 +2905,21 @@ A Golden Era of Numerical Weather Prediction
 \end_layout
 
 \begin_layout Standard
-Through the 1950s and 1960s,
- simulations of the atmosphere became more realistic and the models became more similar to those that are used now.
- From the 1950s to the 1990s huge progress was made and numerical weather prediction made dramatic progress,
- becoming ever more valuable and accurate to longer lead times.
+From the 1950s to the turn of the century,
+ models of the atmosphere became ever more realistic and numerical weather prediction became,
+ first,
+ possible,
+ and then ever more accurate and valuable.
+ Looking back,
+ the progress seemed easier then.
+ The interval between the first paper describing a new method and an operational model was only a few years,
+ and the papers had fewer authors.
 \end_layout
 
 \begin_layout Standard
+In the 1950s,
+ numerical models were still plagued by oscillations and instabilities that were not understood.
+ 
 \begin_inset CommandInset citation
 LatexCommand citet
 key "Smag58"
@@ -2598,6 +2959,9 @@ literal "false"
 
  was still blaming grid-scale oscillations on the lack of smoothness in the initial conditions,
  rather than blaming the numerical methods.
+ However in reality,
+ turbulent diffusion is tiny above the surface boundary layer,
+ which is only about a kilometre deep.
  
 \begin_inset CommandInset citation
 LatexCommand citet
@@ -2646,7 +3010,7 @@ literal "false"
 \end_inset
 
 .
- Arakawa's work was necessary in order to move from vorticity equations to momentum equations,
+ Arakawa's work was necessary in order to move from vorticity equations to the stable solution of momentum equations,
  which is described in the next section.
 \end_layout
 
@@ -2655,6 +3019,190 @@ Arakawa's Numerics
 \begin_inset CommandInset label
 LatexCommand label
 name "subsec:ArakawaGrids"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The Arakawa grids are a selection of options of where variables are stored on a grid,
+ which give different compromises in terms of simplicity,
+ accurate wave propagation and representation of geostrophic balance.
+ They are still hotly debated and there is no overall best option.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+placement document
+alignment document
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Tabular
+<lyxtabular version="3" rows="2" columns="5">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+A
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+B
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+C
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+D
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+E
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset External
+	template XFig
+	filename climate_numFigures/ArakawaGrids/A.fig
+	width 18text%
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset External
+	template XFig
+	filename climate_numFigures/ArakawaGrids/B.fig
+	width 18text%
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset External
+	template XFig
+	filename climate_numFigures/ArakawaGrids/C.fig
+	width 18text%
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset External
+	template XFig
+	filename climate_numFigures/ArakawaGrids/D.fig
+	width 18text%
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset External
+	template XFig
+	filename climate_numFigures/ArakawaGrids/E.fig
+	width 18text%
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Arakawa grids A-E on finite volumes,
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Arakawa-A-E"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
 
 \end_inset
 
@@ -2939,183 +3487,6 @@ literal "false"
 \end_layout
 
 \begin_layout Standard
-\begin_inset Float figure
-placement document
-alignment document
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\begin_inset Tabular
-<lyxtabular version="3" rows="2" columns="5">
-<features tabularvalignment="middle">
-<column alignment="center" valignment="top">
-<column alignment="center" valignment="top">
-<column alignment="center" valignment="top">
-<column alignment="center" valignment="top">
-<column alignment="center" valignment="top">
-<row>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-A
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-B
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-C
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-D
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-E
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset External
-	template XFig
-	filename climate_numFigures/ArakawaGrids/A.fig
-	width 18text%
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset External
-	template XFig
-	filename climate_numFigures/ArakawaGrids/B.fig
-	width 18text%
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset External
-	template XFig
-	filename climate_numFigures/ArakawaGrids/C.fig
-	width 18text%
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset External
-	template XFig
-	filename climate_numFigures/ArakawaGrids/D.fig
-	width 18text%
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset External
-	template XFig
-	filename climate_numFigures/ArakawaGrids/E.fig
-	width 18text%
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption Standard
-
-\begin_layout Plain Layout
-Arakawa grids A-E on finite volumes,
-\begin_inset CommandInset label
-LatexCommand label
-name "fig:Arakawa-A-E"
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
 Gravity waves are not the only phenomena being modelled,
  and even in the linearised shallow water equations the Coriolis terms need to be represented accurately.
  If we consider only the rates of change and the Coriolis terms,
@@ -3277,24 +3648,9 @@ o
 .
 \end_layout
 
-\begin_layout Subsubsection*
-Exercise
-\end_layout
-
-\begin_layout Standard
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-addcontentsline{toc}{subsubsection}{Exercise}
-\end_layout
-
-\end_inset
-
-
+\begin_layout Subsubsection
+Exercise:
+ Two dimensional Shallow Water Equation Solutions
 \end_layout
 
 \begin_layout Standard
@@ -3353,8 +3709,11 @@ literal "false"
  This means that they have the highest possible order of accuracy for the number of grid points.
  This comes at the cost of all to all communication.
  This sounds like a big problem for massively parallel computers.
- However,
- it turns out that ECMWF's spectral model is continuing to scale well.
+ ECMWF's spectral model is continuing to scale well – but we do not know how long can this continue,
+ when it is competing with methods that communicate only locally.
+ The spectral method is also inherently global – it is not suited for local area models,
+ and the ECMWF spectral model is only efficient in hydrostatic mode,
+ whereas the real atmosphere is non-hydrostatic.
  
 \end_layout
 
@@ -3724,24 +4083,8 @@ which can be solved numerically using an ODE solver,
 .
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout Subsubsection
 Spectral Method Exercises
-\end_layout
-
-\begin_layout Standard
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-addcontentsline{toc}{subsubsection}{Spectral Method Exercises}
-\end_layout
-
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -3955,24 +4298,8 @@ name "fig:semiLagrangian"
 
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout Subsubsection
 Semi-Lagrangian Exercise
-\end_layout
-
-\begin_layout Standard
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-addcontentsline{toc}{subsubsection}{Semi-Lagrangian Exercise}
-\end_layout
-
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -4001,6 +4328,12 @@ status open
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+Some highly accurate and efficient numerical methods have been introduced in this section,
+ which enabled weather prediction to improve in leaps and bounds.
+ But some very different thinking will be needed for performance to continue to improve on modern computers.
 \end_layout
 
 \begin_layout Section
@@ -4152,6 +4485,42 @@ literal "false"
  quasi-uniform meshes of the sphere are needed,
  which do not have convergence of points towards the poles,
  or any other locations.
+ The next Met Office model,
+ LFRic,
+ uses a quasi-uniform mesh and 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "BBD+26"
+literal "false"
+
+\end_inset
+
+ demonstrated scaling to 383,216 CPUs on ARCHER2,
+ which uses AMD Epyc compute nodes.
+ LFRic should be operational by the time you read this.
+ More on LFRic in sections 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:FFSL"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:mixedFEM"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Subsection
@@ -4205,6 +4574,9 @@ m in the east-west direction!
  all of the 2,560 grid points in the east-west direction around each pole will need to be in communication,
  despite being on different processors.
  This inevitably slows the simulation down.
+ At modern resolutions,
+ latitude-longitude grids are not merely inefficient,
+ they are a fundamental barrier to scalability.
  This century,
  weather prediction has been moving away from the latitude-longitude grid due (in part) to the parallel scaling bottle necks as the number of parallel processors increases.
  Even before parallel scaling was a critical bottleneck,
@@ -4371,13 +4743,14 @@ literal "false"
 \end_layout
 
 \begin_layout Section
-Numerical Methods for Quasi-Uniform Meshes
+Numerical Methods for the Future
 \end_layout
 
 \begin_layout Standard
 The numerical methods developed for latitude-longitude grids,
  such as semi-implicit,
- semi-Lagrangian and the Arakawa C-grid have superb accuracy and are efficient as long as the domain is not decomposed onto too many parallel processors.
+ semi-Lagrangian and the Arakawa C-grid have superb accuracy and are efficient as long as the domain is not decomposed onto too many parallel processors,
+ which is needed on modern computers.
  Moving to alternative meshes,
  such as the cubed sphere or icosahedra (fig.
  
@@ -4662,24 +5035,9 @@ nolink "false"
  regardless of how the mapping is done.
 \end_layout
 
-\begin_layout Subsubsection*
-Exercise
-\end_layout
-
-\begin_layout Standard
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-addcontentsline{toc}{subsubsection}{Exercise}
-\end_layout
-
-\end_inset
-
-
+\begin_layout Subsubsection
+Exercise:
+ Equivalence of Finite Volume and Finite Difference
 \end_layout
 
 \begin_layout Standard
@@ -4947,24 +5305,9 @@ In many ways,
  
 \end_layout
 
-\begin_layout Subsubsection*
-Exercises
-\end_layout
-
-\begin_layout Standard
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-addcontentsline{toc}{subsubsection}{Exercises}
-\end_layout
-
-\end_inset
-
-
+\begin_layout Subsubsection
+Exercises:
+ Finite Volume Solutions of the Advection Equation
 \end_layout
 
 \begin_layout Enumerate
@@ -5482,6 +5825,13 @@ literal "false"
 
 \begin_layout Subsection
 Mixed Finite Elements
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:mixedFEM"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -5546,11 +5896,12 @@ status open
 \end_layout
 
 \begin_layout Section
-Key Takeaways
+Key Messages
 \end_layout
 
 \begin_layout Itemize
-Fast waves impose severe stability constraints.
+Fast waves can dominate numerical stability,
+ not forecast skill.
 \end_layout
 
 \begin_layout Itemize
@@ -5578,6 +5929,7 @@ Latitude-longitude grids do not scale to exascale computing.
 \begin_layout Itemize
 Machine learned weather prediction models are cheaper,
  once they are trained.
+ They cannot yet predict climate.
 \end_layout
 
 \end_body
