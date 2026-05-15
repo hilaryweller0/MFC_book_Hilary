@@ -133,24 +133,6 @@ name "sec:abstract"
 \end_layout
 
 \begin_layout Standard
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-addcontentsline{toc}{section}{
-\backslash
-nameref{sec:abstract}}
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
 Meteorology is the science of weather and climate.
  The value of meteorology is prediction,
  and the most powerful predictions use large models that solve the equations governing the dynamics and physics of the atmosphere and ocean numerically.
@@ -177,6 +159,17 @@ order methods such as spectral elements and discontinuous Galerkin.
  The most important take away message is that no numerical method is perfect,
  but the numerical models are useful.
  
+\end_layout
+
+\begin_layout Standard
+This chapter does not address data assimilation,
+ the initialisation procedure for weather prediction models,
+ combining observations and previous model states.
+ Data assimilation has been transformative in improving weather prediction,
+ but it is not discussed in this book,
+ which is about mathematics in climate rather than weather.
+ This chapter is about the part of weather prediction that happens after the initialisation,
+ which is the same type of modelling as is used for climate.
 \end_layout
 
 \begin_layout Section
@@ -3026,10 +3019,47 @@ name "subsec:ArakawaGrids"
 \end_layout
 
 \begin_layout Standard
-The Arakawa grids are a selection of options of where variables are stored on a grid,
- which give different compromises in terms of simplicity,
+The Arakawa grids A-E 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "AL77"
+literal "false"
+
+\end_inset
+
+ are a selection of options of where pressure and velocity are stored on a grid (figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Arakawa-A-E"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+).
+ They give different compromises in terms of simplicity,
  accurate wave propagation and representation of geostrophic balance.
  They are still hotly debated and there is no overall best option.
+ 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "AL77"
+literal "false"
+
+\end_inset
+
+ described the numerical methods used on the UCLA general circulation model;
+ a landmark in the development of stable and accurate numerical methods for the atmosphere,
+ a 92 page article that is still being cited (3,538 citations in total,
+ with over 100 citations every year since 2014).
+ The model was three dimensional with 12 vertical levels,
+ 
+\begin_inset Formula $72\times45$
+\end_inset
+
+ grid points in the horizontal and a time step of 6 minutes.
 \end_layout
 
 \begin_layout Standard
@@ -3190,6 +3220,8 @@ E
 
 \begin_layout Plain Layout
 Arakawa grids A-E on finite volumes,
+ with components of velocity and height at different locations.
+ 
 \begin_inset CommandInset label
 LatexCommand label
 name "fig:Arakawa-A-E"
@@ -3210,100 +3242,7 @@ name "fig:Arakawa-A-E"
 \end_layout
 
 \begin_layout Standard
-\begin_inset CommandInset citation
-LatexCommand citet
-key "AL77"
-literal "false"
-
-\end_inset
-
- described the numerical methods used on the UCLA general circulation model;
- a landmark in the development of stable and accurate numerical methods for the atmosphere,
- a 92 page article that is still being cited (3,538 citations in total,
- with over 100 citations every year since 2014).
- The model is three dimensional with 12 vertical levels,
- 
-\begin_inset Formula $72\times45$
-\end_inset
-
- grid points in the horizontal and a time step of 6 minutes.
- 
-\begin_inset CommandInset citation
-LatexCommand citet
-key "AL77"
-literal "false"
-
-\end_inset
-
- is best known for the description of the Arakawa grids - 5 arrangements of prognostic variables on a grid.
- They wrote the momentum equation,
- for the horizontal velocity,
- 
-\begin_inset Formula $\mathbf{v}$
-\end_inset
-
-,
- in vector-invariant form
-\begin_inset Formula 
-\begin{equation}
-\frac{D\mathbf{v}}{Dt}+f\mathbf{k}\times\mathbf{v}+\frac{1}{\rho}\nabla_{h}p+\nabla_{h}K=\mathbf{F}_{h}
-\end{equation}
-
-\end_inset
-
-where 
-\begin_inset Formula $K=\frac{1}{2}|\mathbf{v}|^{2}$
-\end_inset
-
- is the kinetic energy,
- 
-\begin_inset Formula $\mathbf{F}_{h}$
-\end_inset
-
- is the horizontal component of the frictional force and 
-\begin_inset Formula $\nabla_{h}$
-\end_inset
-
- is the horizontal component of the gradient.
- Solving the vector-invariant form enables exact energy conservation,
- with losses in gravitiational potential being exactly transferred to kinetic energy,
- and back.
- The Arakawa grids A-E are shown in figure 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:Arakawa-A-E"
-plural "false"
-caps "false"
-noprefix "false"
-nolink "false"
-
-\end_inset
-
-.
- The advantages and dis-advantages of these grids can best be seen in terms of the linearised shallow water equations.
- The one-dimensional linearised shallow water equations without Coriolis are (
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "eq:linSWu"
-plural "false"
-caps "false"
-noprefix "false"
-nolink "false"
-
-\end_inset
-
-,
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "eq:linSWh"
-plural "false"
-caps "false"
-noprefix "false"
-nolink "false"
-
-\end_inset
-
-).
+The advantages and dis-advantages of the Arakawa grids A-E can best be seen in terms of the linearised shallow water equations.
  The two-dimensional linearised shallow water equations can be obtained by replacing 
 \begin_inset Formula $D/Dt$
 \end_inset
@@ -3357,6 +3296,19 @@ nolink "false"
 \end_inset
 
 ).
+ Write out these equations to help you to understand the following argument,
+ with reference to figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Arakawa-A-E"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+.
  As was investigated in example 
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -3423,29 +3375,7 @@ nolink "false"
 
  can be present which do not lead to divergence.
  These oscillations are spurious computational modes and make the A-grid problematic for atmospheric modelling.
- Considering the height gradients and the divergence terms of eqns (
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "eq:SWu"
-plural "false"
-caps "false"
-noprefix "false"
-nolink "false"
-
-\end_inset
-
--
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "eq:SWh"
-plural "false"
-caps "false"
-noprefix "false"
-nolink "false"
-
-\end_inset
-
-),
+ Considering the height gradients and the divergence terms of the shallow water equations,
  the C-grid appears to be ideal – compact height gradients in the 
 \begin_inset Formula $x$
 \end_inset
@@ -3487,8 +3417,8 @@ literal "false"
 \end_layout
 
 \begin_layout Standard
-Gravity waves are not the only phenomena being modelled,
- and even in the linearised shallow water equations the Coriolis terms need to be represented accurately.
+Gravity waves are not the only phenomena being modelled.
+ The Coriolis term also needs to be represented accurately.
  If we consider only the rates of change and the Coriolis terms,
  we get equations for inertial oscillations
 \begin_inset Formula 
@@ -3572,19 +3502,20 @@ literal "false"
 \end_inset
 
  will be stored at 
-\begin_inset Formula $\left(i+1/2,j\right)$
+\begin_inset Formula $\left(i\pm1/2,j\right)$
 \end_inset
 
- and updated with averaging for the Coriolis term:
-\begin_inset Formula 
-\begin{align}
-u_{i+1/2,j}^{(n+1)} & =u_{i+1/2,j}^{(n)}\\
- & +\Delta t\left\{ f\frac{v_{i,j-1/2}+v_{i+1,j-1/2}+v_{i,j+1/2}+v_{i+1,j+1/2}}{4}-g\frac{h_{i+1,j}-h_{i,j}}{\Delta x}\right\} \nonumber 
-\end{align}
-
+ and 
+\begin_inset Formula $v$
 \end_inset
 
-This averaging reduces accuracy and enables spurious computational modes at coarse resolution,
+ at 
+\begin_inset Formula $\left(i,j\pm1/2\right)$
+\end_inset
+
+.
+ This means that a lot of averaging is needed in the Coriolis term to update the velocity.
+ This averaging reduces accuracy and enables spurious computational modes at coarse resolution,
  but the accurate representation of gravity waves has proven to be more important for atmospheric modelling.
  This may seem counter intuitive,
  considering that 
@@ -3605,8 +3536,8 @@ entirely irrelevant gravity motions
 
 .
  They are not irrelevant.
- They are the mechanism by which the flow comes into geostrophic balance – if there is a region of high height and no flow along the boundary of the high height,
- then gravity waves will be generated,
+ They are the mechanism by which the flow comes into geostrophic balance – if there is a region of high height but no flow at the edge,
+ then gravity waves will radiate out,
  flow will be created and the fluid will move towards geostrophic balance (a process called geostrophic adjustment).
  If gravity waves are filtered then this process is assumed to happen instantaneously.
  It is essential that gravity waves are represented in order to adjust the fluid to geostrophic balance,
@@ -3666,7 +3597,21 @@ todo[inline]{
 
 \end_inset
 
-Write a C-grid and an A-grid shallow water model?
+Write a C-grid and an A-grid model for the linear shallow water equations.
+ Put equations for updating 
+\begin_inset Formula $u$
+\end_inset
+
+,
+ 
+\begin_inset Formula $v$
+\end_inset
+
+ and 
+\begin_inset Formula $h$
+\end_inset
+
+ here.
 \begin_inset ERT
 status open
 
@@ -3694,8 +3639,8 @@ literal "false"
 
 \end_inset
 
-.
- ECMWF specialise in forecasts with lead times of one to two weeks.
+,
+ specialising in forecasts with lead times of one to two weeks.
  Skillfull forecasts at these longer lead times was made possible when they switched from finite differences to the spectral method 
 \begin_inset CommandInset citation
 LatexCommand citep
@@ -3704,11 +3649,11 @@ literal "false"
 
 \end_inset
 
- to solve the primitive equations on there sphere.
- Spectral methods have exponential convergence.
- This means that they have the highest possible order of accuracy for the number of grid points.
+.
+ Spectral methods have exponential convergence,
+ which means that they have the highest possible order of accuracy for the number of grid points.
  This comes at the cost of all to all communication.
- This sounds like a big problem for massively parallel computers.
+ This sounds like a problem for massively parallel computers.
  ECMWF's spectral model is continuing to scale well – but we do not know how long can this continue,
  when it is competing with methods that communicate only locally.
  The spectral method is also inherently global – it is not suited for local area models,
@@ -3728,10 +3673,7 @@ literal "false"
 \end_inset
 
  provides a more general definition.
-\end_layout
-
-\begin_layout Standard
-In order to solve
+ In order to solve
 \begin_inset Formula 
 \begin{equation}
 \frac{\partial\phi}{\partial t}+F\left(\phi\right)=0\label{eq:generalPDE}
@@ -4131,7 +4073,7 @@ Work out spectral method for linear advection with a source,
 \end_layout
 
 \begin_layout Standard
-Work out spectral method for the SWE
+Work out spectral method for the SWE in 1D
 \end_layout
 
 \begin_layout Standard
@@ -4176,11 +4118,7 @@ nolink "false"
 ) so that,
  typically,
  air or its properties cannot be transported more than one grid box in one time step.
- This might sound restrictive,
- but is actually useful for accuracy,
- so is often not a problem.
- However,
- the state of the art until this century was to use a latitude-longitude grid (fig 
+ This is particularly problematic on a latitude-longitude grid (fig 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "fig:grids"
@@ -4191,8 +4129,7 @@ nolink "false"
 
 \end_inset
 
-) in which lines of constant longitude converge towards the poles,
- making spatial resolution unnecessarily high and making the time step restriction prohibitive.
+) in which lines of constant longitude converge towards the poles making the time step restriction prohibitive.
  Before semi-Lagrangian advection,
  prohibitive time step restrictions near the poles were ameliorated using polar filtering 
 \begin_inset CommandInset citation
@@ -4204,7 +4141,7 @@ literal "false"
 \end_inset
 
 ,
- in which short wavelength waves in the zonal direction (along lines of constant latitude) were filtered out.
+ in which short wavelength waves in the zonal direction (along lines of constant latitude) were filtered out near the poles.
  This enabled useful forecasts but also removed energy from the model.
  The polar filtering and artificial viscosity needed to keep the Met Office model from this era stable were described as treacle,
  limiting forecast skill.
@@ -4212,6 +4149,26 @@ literal "false"
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Rob82,PS84,PL91,RTS+95,Hort02,DCM+05"
+literal "false"
+
+\end_inset
+
+.
+ Following the successful use of semi-implicit,
+ semi-Lagrangian (SISL) modelling at ECMWF 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "RTS+95"
+literal "false"
+
+\end_inset
+
+,
+ the UK Met Office replaced their explicit B-grid model with a semi-implicit,
+ semi-Lagrangian C-grid model 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "CDM+97,DCM+05"
 literal "false"
 
 \end_inset
@@ -4233,11 +4190,50 @@ The Courant-Friedrichs-Lewy (CFL) condition states that the domain of dependence
  Instead of approximating spatial gradients on the grid,
  we look upstream to where things came from,
  and map the old upstream values onto the grid at the new time level.
- For each grid point at the new time step,
- we find a departure point,
- which won't usually fall on a grid point,
- and interpolate from the old values onto the departure point.
- This enables long,
+ We want to evaluate 
+\begin_inset Formula $\psi_{i,j}^{(n+1)}$
+\end_inset
+
+ (see figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:semiLagrangian"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+ left).
+ We need to know where it came from at time 
+\begin_inset Formula $n$
+\end_inset
+
+,
+ the departure point,
+ 
+\begin_inset Formula $d$
+\end_inset
+
+,
+ which probably won't fall on a grid point.
+ So the values of 
+\begin_inset Formula $\psi^{(n)}$
+\end_inset
+
+ on the grid need to be interpolated onto 
+\begin_inset Formula $d$
+\end_inset
+
+,
+ which gives us the new value,
+ 
+\begin_inset Formula $\psi_{i,j}^{(n+1)}$
+\end_inset
+
+.
+ Semi-Lagrangian enables long,
  stable and accurate time steps,
  but the properties transported are not conserved.
  This means that there can be spurious sources and sinks of mass,
@@ -4278,7 +4274,57 @@ status open
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
-Semi-Lagrangian and flux-form semi-Lagrangian
+Left:
+ depicting semi-Lagrangian with variable 
+\begin_inset Formula $\psi$
+\end_inset
+
+ at grid location 
+\begin_inset Formula $\left(i,j\right)$
+\end_inset
+
+ with wind trajectories.
+ 
+\begin_inset Formula $d$
+\end_inset
+
+ is the departure point of 
+\begin_inset Formula $\left(i,j\right)$
+\end_inset
+
+:
+ the point the wind left at the previous time step to arrive at 
+\begin_inset Formula $\left(i,j\right)$
+\end_inset
+
+.
+ To find 
+\begin_inset Formula $\psi_{i,j}^{(n+1)}$
+\end_inset
+
+,
+ we interpolate the values of 
+\begin_inset Formula $\psi^{(n)}$
+\end_inset
+
+ onto 
+\begin_inset Formula $d$
+\end_inset
+
+.
+ Right:
+ depicting flux-form semi-Lagrangian with trajectories through a face of a hexagonal mesh.
+ To find the amount of 
+\begin_inset Formula $\psi$
+\end_inset
+
+ advected through the face in one time step,
+ 
+\begin_inset Formula $\psi$
+\end_inset
+
+ at the old time level is mapped to the shaded swept area.
+ 
 \begin_inset CommandInset label
 LatexCommand label
 name "fig:semiLagrangian"
@@ -4342,10 +4388,7 @@ The Pole Problem and Parallel Computing
 
 \begin_layout Standard
 This section explains why the choice of discretisation is dictated as much by computer architecture as by numerical analysis.
-\end_layout
-
-\begin_layout Standard
-In the 1970s to 1990s,
+ In the 1970s to 1990s,
  numerical weather prediction used mainframe computers such as the vector-parallel Cray computers.
  Parallel means that they had more than one processor,
  running in parallel.
@@ -4393,30 +4436,9 @@ Even in the 1990s,
 \end_layout
 
 \begin_layout Standard
-Following the successful use of semi-implicit,
- semi-Lagrangian (SISL) modelling at ECMWF 
-\begin_inset CommandInset citation
-LatexCommand citep
-key "RTS+95"
-literal "false"
-
-\end_inset
-
-,
- the UK Met Office replaced their explicit B-grid model with a semi-implicit,
- semi-Lagrangian C-grid model 
-\begin_inset CommandInset citation
-LatexCommand citep
-key "CDM+97,DCM+05"
-literal "false"
-
-\end_inset
-
-.
- SISL enables excellent weather and climate prediction on latitude-longitude grids since SISL overcomes time step restrictions near the poles.
- At time of writing the operational model used by the UK Met Office,
+At time of writing the operational model used by the UK Met Office,
  EndGame,
- still uses SISL on a latutide-longitude grid,
+ still uses a latutide-longitude grid,
  and has consistently been one of the most accurate models,
  usually second only to ECMWF 
 \begin_inset CommandInset citation
@@ -4430,7 +4452,7 @@ literal "false"
 .
  However the combination of further parallelisation,
  increased resolution and the convergence of meridians towards the poles means that parallelisation progress on latitude-longitude grids is stuck – more processors are added,
- domains get smaller and the code does not run faster or even at the same speed using higher resolution.
+ domains get smaller and the code does not run faster.
  It is not possible to overcome the large amount of communication that must be done near the poles to make latitude-longitude usable at modern high resolutions.
  
 \end_layout
@@ -4460,11 +4482,9 @@ literal "false"
 \end_inset
 
 .
- The UK Met Office has recently moved to cloud based computing provided my Microsoft's Azure service,
- which gives them flexibility on how many and what type of core they use.
  However the weather prediction models can rarely use the whole of any modern supercomputer because,
  even if the whole computer were available,
- the model would not be able to scale well enough to use so many processors efficiently;
+ the model would not scale well enough to use so many processors efficiently;
  processors would end up spending too much time waiting for data from neighbouring processors.
  This is the parallel scaling problem.
  The current Met Office model,
@@ -4483,8 +4503,7 @@ literal "false"
  highest resolution solutions.
  In order to scale in parallel on 10s or 100s of thousands of processor,
  quasi-uniform meshes of the sphere are needed,
- which do not have convergence of points towards the poles,
- or any other locations.
+ which do not have convergence of points towards the poles.
  The next Met Office model,
  LFRic,
  uses a quasi-uniform mesh and 
@@ -4581,7 +4600,7 @@ m in the east-west direction!
  weather prediction has been moving away from the latitude-longitude grid due (in part) to the parallel scaling bottle necks as the number of parallel processors increases.
  Even before parallel scaling was a critical bottleneck,
  ECMWF moved to a reduced grid,
- which coarser resolution towards the poles 
+ with coarser resolution towards the poles 
 \begin_inset CommandInset citation
 LatexCommand citep
 key "HS91"
@@ -4590,7 +4609,7 @@ literal "false"
 \end_inset
 
  in order to save in computation time and memory requirement.
- This was more straightforward using a spectral model as they key point was to use few wavenumbers close to the poles.
+ This was more straightforward using a spectral model than a grid point model as they key point was to use few wavenumbers close to the poles.
  
 \end_layout
 
@@ -4703,10 +4722,7 @@ nolink "false"
 \end_inset
 
  is quasi-uniform – all of the grid boxes have similar dimensions and a low aspect ratio.
- However the mesh is not orthogonal – local co-ordinate systems for each of the cube faces are not at right angles.
- A cubed sphere can be constructed to be orthogonal,
- but then resolution clusters towards the cube corners,
- removing the quasi-uniform property.
+ However the distortions mean that simple finite differences are no longer accurate.
  Meshes of polygons (such a the hexagonal icosahedron,
  right of fig 
 \begin_inset CommandInset ref
@@ -4719,27 +4735,18 @@ nolink "false"
 
 \end_inset
 
-) and meshes of triangles are quasi-uniform and can be constructed to be orthogonal.
- For these meshes,
- orthogonality needs a different definition.
- The triangular icosahedron is the dual of the hexagonal icosahedron.
- This means that if you put a point at the centre of each polygon of the hexagonal icosahedron,
- and join the points over the edges,
- then you get the triangular icosahedron.
- If the mesh and its dual have edges that cross at right angles,
- then the mesh is orthogonal.
- Orthogonal meshes have advangages in terms of accuracy and efficiency,
- but there are other considerations,
- such as the skewness – do the edges of the dual grids bisect each other or cross not at the edge centres 
-\begin_inset CommandInset citation
-LatexCommand citep
-key "Wel14"
-literal "false"
+) and meshes of triangles are also quasi-uniform but these shapes can cause other problems (see section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:FV_AC"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
 
 \end_inset
 
-.
- There are compromises to be made when optimising icosahedral meshes for numerical methods.
+).
 \end_layout
 
 \begin_layout Section
@@ -4766,7 +4773,7 @@ nolink "false"
 
 ),
  means that more complex numerical methods are needed in order to retain accuracy.
- This section describes some more complex spatial discretisation.
+ 
 \end_layout
 
 \begin_layout Subsection
@@ -4822,7 +4829,12 @@ nolink "false"
 
 \end_inset
 
-The finite volume method predicts density weighted volume averages (for example the mass of an atmospheric constituent,
+The finite volume method predicts density weighted volume averages (for example 
+\begin_inset Formula $\rho\phi$
+\end_inset
+
+,
+ the mass of an atmospheric constituent,
  
 \begin_inset Formula $\phi$
 \end_inset
@@ -4862,15 +4874,18 @@ nolink "false"
 ) and the chain rule:
 \begin_inset Formula 
 \begin{align}
-\frac{\partial\rho\phi}{\partial t} & =\rho\frac{\partial\phi}{\partial t}+\phi\frac{\partial\rho}{\partial t}\nonumber \\
- & =\rho\left\{ -\mathbf{u}\cdot\nabla\phi\right\} +\phi\left\{ -\nabla\cdot\left(\mathbf{u}\rho\right)\right\} \nonumber \\
+\frac{\partial\rho\phi}{\partial t} & =\rho\frac{\partial\phi}{\partial t}+\phi\frac{\partial\rho}{\partial t}=\rho\left\{ -\mathbf{u}\cdot\nabla\phi\right\} +\phi\left\{ -\nabla\cdot\left(\mathbf{u}\rho\right)\right\} \nonumber \\
 \implies\frac{\partial\rho\phi}{\partial t} & +\nabla\cdot\left(\rho\mathbf{u}\phi\right)=0.\label{eq:linAdvectFlux}
 \end{align}
 
 \end_inset
 
+
+\end_layout
+
+\begin_layout Standard
 To simplify the definition of the finite volume method,
- we will assume that 
+ we assume that 
 \begin_inset Formula $\rho$
 \end_inset
 
@@ -5145,7 +5160,7 @@ nolink "false"
 
 ,
  has played a large role in enabling unprecedented accuracy in weather prediction.
- However standard (interpolating) semi-Lagrangian is not conservative – the total mass of the quantity advected can change just because it is being advected.
+ However standard (interpolating) semi-Lagrangian is not conservative – the total mass of the quantity advected can change just because it is being moved around.
  This is not correct and makes semi-Lagrangian unsuitable for climate prediction and for the next generation in weather prediction.
  A popular solution is flux-form semi-Lagrangian (FFSL),
  which is a type of finite volume advection scheme.
@@ -5205,7 +5220,7 @@ Rather than interpolating onto a departure point,
  interpolation is onto the volume of air that sweeps through each face in a time step (fig 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:SL"
+reference "fig:semiLagrangian"
 plural "false"
 caps "false"
 noprefix "false"
@@ -5416,11 +5431,42 @@ Assuming
 \end_layout
 
 \begin_layout Enumerate
-Implement PPM to solve the linear advection equation in 1D (give the equation for a uniform 1d grid).
+Implement PPM to solve the linear advection equation in 1D 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+todo[inline]{
+\end_layout
+
+\end_inset
+
+(give the equation for a uniform 1d grid).
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsection
 Finite Volume A- and C-grids for unstructured meshes
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:FV_AC"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -5599,8 +5645,7 @@ literal "false"
 
 \end_inset
 
-,
- who found serious deficiencies in both the A- and C-grids on hexagonal icosahedral meshes.
+.
  This provides a strong motivation to move to more complex numerical methods for quasi-uniform meshes.
 \end_layout
 
@@ -5613,6 +5658,75 @@ name "subsec:SE"
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+Spectral elements enables arbitrarily high-order accuracy on a variety of meshes,
+ and are efficient on massively parallel computers.
+ Fourth-order accurate spectral elements are used in a version of NCAR Community Atmosphere Model,
+ CAM-SE 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "NRC+10,ELM+13"
+literal "false"
+
+\end_inset
+
+ on a cubed sphere (fig.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:CAMSE"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+,
+ right).
+ Considering just the horizontal discretisation in CAM-SE,
+ the surface of the Earth is divided into quadrilateral elements (fig.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:CAMSE"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+,
+ left).
+ The solution is approximated on each element using a basis function which is a two-dimensional,
+ third-order polynomial.
+ A key advantage of spectral elements is that they use Lagrange interpolation 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "WTB+07"
+literal "false"
+
+\end_inset
+
+ which means that the basis functions passes through nodes on each element exactly and the weights of each basis function are cheap to compute and avoid global communication.
+ By placing these notes at Gauss-Legendre-Lobatto quadrature points (fig.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:CAMSE"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+,
+ left) the order of accuracy is one more than the degree of the polynomial used,
+ so the third-order polynomial basis functions give a fourth-order accurate numerical method.
 \end_layout
 
 \begin_layout Standard
@@ -5676,62 +5790,6 @@ name "fig:CAMSE"
 \end_inset
 
 
-\end_layout
-
-\begin_layout Standard
-Spectral elements enables arbitrarily high-order accuracy on a variety of meshes,
- and are extremely efficient on massively parallel computers.
- Fourth-order accurate spectral elements are used in a version of NCAR Community Atmosphere Model,
- CAM-SE 
-\begin_inset CommandInset citation
-LatexCommand citep
-key "NRC+10,ELM+13"
-literal "false"
-
-\end_inset
-
- on a cubed sphere (fig.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:CAMSE"
-plural "false"
-caps "false"
-noprefix "false"
-nolink "false"
-
-\end_inset
-
-,
- right).
- Considering just the horizontal discretisation in CAM-SE,
- the surface of the Earth is divided into quadrilateral elements.
- The solution is approximated on each element using a basis function which is a two-dimensional,
- third-order polynomial.
- A key advantage of spectral elements is that they use Lagrange interpolation 
-\begin_inset CommandInset citation
-LatexCommand citep
-key "WTB+07"
-literal "false"
-
-\end_inset
-
- which means that the basis functions passes through nodes on each element exactly and the weights of each basis function are cheap to compute and avoid global communication.
- By placing these notes at Gauss-Legendre-Lobatto quadrature points (fig.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:CAMSE"
-plural "false"
-caps "false"
-noprefix "false"
-nolink "false"
-
-\end_inset
-
-,
- left) the order of accuracy is one more than the degree of the polynomial used,
- so the third-order polynomial basis functions give a fourth-order accurate numerical method.
 \end_layout
 
 \begin_layout Standard
@@ -5799,8 +5857,8 @@ The discontinuous Galerkin method (DG) is similar to the spectral element method
  leading to asymmetry,
  and more upwind information than downwind is used in calculations.
  DG can handle discontinuous fields without the need to introduce artificial diffusion,
- but is is slightly more expensive.
- The cost is offset by the excellent scaling properties on massively parallel computers.
+ but is is more expensive.
+ The cost is partly offset by the scaling properties on massively parallel computers.
  DG is not currently being used operationally for weather prediction but powerful research models exist such as NUMA-NEPTUNE,
  
 \begin_inset CommandInset citation
@@ -5849,6 +5907,7 @@ todo[inline]{
 
 SE and DG are co-located.
  This motivates mixed finite elements/compatible finite elements.
+ Also talk more about LFRic and its name.
 \begin_inset ERT
 status open
 
@@ -5860,6 +5919,76 @@ status open
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+Superbly accurate simulaions are possible using spectral elements and discontinuous Galerkin methods (SE&DG) and SE&DG are highly scalable on parallel machines.
+ However both SE&DG have the same representation for pressure and velocity – pressure and velocity use the same basis functions and are evaluated at the same quadrature points.
+ This means that they will inevitably suffer from similar computational modes to the Arakawa A-grid – grid-scale oscillations in pressure or velocity will not fully control each other.
+ For SE&DG these problems are not as severe as for the original A-grid because the order of accuracy is so much higher using SE&DG.
+ For SE,
+ grid-scale oscillations are controlled by diffusion or filters.
+ It seems ineffiecient to make the effort of high-order accuracy and applying filters just to control oscillations that shouldn't be there in the first place.
+ This is where mixed finite elements come in.
+\end_layout
+
+\begin_layout Standard
+Mixed finite elements have different basis functions for pressure and velocity in order to eliminate computational modes like those of the A-grid.
+ 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "CS12"
+literal "false"
+
+\end_inset
+
+ described how mixed finite elements can be used to achieve conservation and balance properties equivalent to a C-grid but on irregular meshes such as the cubed-sphere and triangular icosaheron.
+ This works using the lowest order elements (for second-order accuracy) and for higher-order elements.
+ This comes at the cost of inverting a mass matrix a few times every time step,
+ in order to find the basis function weights,
+ but the solution of mass matrices is more efficient and more scalable than the pressure equations solved in the semi-implicit method.
+ Care is needed when choosing the basis functions for pressure and velocity.
+ In two dimensions,
+ there should be twice as many velocity degrees of freedom as pressure degrees of freedom so that oscillations in one variable in each direction are fully controlled by the other.
+ This is necessary but not sufficient condition to fully control all possible oscillations.
+ 
+\end_layout
+
+\begin_layout Standard
+Mixed finite elements are used in the new Met Office model,
+ LFRic (named after L.F.
+ Richardson who kicked off this chapter).
+ LFRic uses the lowest order element pair for the acoustic and gravity wave terms of the primitive equations on a cubed sphere 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "AFH+19"
+literal "false"
+
+\end_inset
+
+,
+ while advection uses their new SWIFT FFSL scheme (section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:FFSL"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+).
+ LFRic is producing results as accurate as their latitude-longitude model with far superiour parallel scaling 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "BBD+26"
+literal "false"
+
+\end_inset
+
+.
+ Hopefully it will be in use for operations by the time this book is published.
 \end_layout
 
 \begin_layout Section
@@ -5893,6 +6022,13 @@ status open
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+Machine learning has been a disrupter in weather prediction,
+ a game changer.
+ It has only recently started but is already creating some skillful forecasts with less computational power than models that solve PDEs.
+ 
 \end_layout
 
 \begin_layout Section
