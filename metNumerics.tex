@@ -1,29 +1,35 @@
 
-\chapter[Numerics in Meteorology]{Numerics in Meteorology:\protect \\
-Past, Present and Future}
+\chapter{The Evolution of Numerical Methods in Climate Prediction}
 
 \textbf{Author:} Hilary Weller
 
-\section*{Abstract}\label{sec:abstract}
-
-Meteorology is the science of weather and climate. The value of meteorology
-is prediction, and the most powerful predictions use large models
-that solve the equations governing the dynamics and physics of the
-atmosphere and ocean numerically. At the heart of these models are
-dynamical cores. The dynamical core solves the partial differential
+Detailed climate modelling is done using weather prediction models,
+so this chapter is about the history, current state and future of
+numerical weather prediction models. At the heart of a weather or
+climate model is a dynamical core, that solves the partial differential
 equations that predict winds, temperature, pressure and the moisture
 content of the atmosphere. This chapter explains why weather and climate
-models use the numerical methods they do. Weather and climate models
-have constraints from fast waves in the atmosphere, from the geometry
-of the planet, from the computers that we use and from the delicate
-balances of atmospheric motion. We begin with early finite\nobreakdash-difference
+models use the numerical methods that they do. Weather and climate
+models have constraints from fast waves in the atmosphere, from the
+geometry of the planet, from the computers that we use and from the
+delicate balances of atmospheric motion. We begin with early finite-difference
 approaches and the problem of fast waves, then show how elliptic solves,
-grid staggering, spectral methods and semi\nobreakdash-implicit methods
-emerged. We then turn to modern challenges: parallel computing, quasi\nobreakdash-uniform
-spherical meshes, and high\nobreakdash-order methods such as spectral
-elements and discontinuous Galerkin. The most important take away
-message is that no numerical method is perfect, but the numerical
-models are useful. 
+grid staggering, spectral methods and semi-implicit methods emerged.
+We then turn to modern challenges: parallel computing, quasi-uniform
+spherical meshes, and high-order methods such as spectral elements
+and discontinuous Galerkin, with a final note on machine learning.
+The most important take away message is that all numerical method
+have defects, but the numerical models are useful. This is in the
+spirit of the well-known remark by \citet{BD87} that ``all models
+are wrong, but some are useful''. 
+
+This chapter does not address data assimilation, the initialisation
+procedure for weather prediction models, combining observations and
+previous model states. Data assimilation has been transformative in
+improving weather prediction, but it is not discussed in this book,
+which is about mathematics in climate rather than weather. This chapter
+is about the part of weather prediction that happens after the initialisation,
+which is the same type of modelling as is used for climate.
 
 \section{The Early Days of Numerical Weather Prediction}
 
@@ -555,7 +561,8 @@ left corners. Write code to create this matrix.
 \item Write code to calculate an array for the right hand side of the matrix
 equation. 
 \item In your staggered grid code for exercise \ref{ex:explicitSWE}, instead
-of updating $h$ explicitly, write some code something like:\bgroup\inputencoding{latin9}
+of updating $h$ explicitly, write some code something like:
+\bgroup\inputencoding{latin9}
 \begin{lstlisting}
 # At the top of the file:
 import numpy.linalg as la
@@ -1392,18 +1399,40 @@ control all possible oscillations.
 Mixed finite elements are used in the new Met Office model, LFRic
 (named after L.F. Richardson who kicked off this chapter). LFRic uses
 the lowest order element pair for the acoustic and gravity wave terms
-of the primitive equations on a cubed sphere \textbackslash cite\{??\},
-while advection uses their new SWIFT FFSL scheme (section \ref{subsec:FFSL}).
+of the primitive equations on a cubed sphere \citep{AFH+19}, while
+advection uses their new SWIFT FFSL scheme (section \ref{subsec:FFSL}).
 LFRic is producing results as accurate as their latitude-longitude
-model with far superiour parallel scaling \textbackslash cite\{??\}.
-Hopefully it will be in use for operations by the time this book is
-published.
+model with far superiour parallel scaling \citep{BBD+26}. Hopefully
+it will be in use for operations by the time this book is published.
 
 \section{Is Machine Learning the Future of Weather and Climate Prediction}
 
-\todo[inline]{ML weather forecasts are great. Current ML models drift
-and usually diverge to an unrealistic state within a few weeks. Lots
-of work to do here.}
+Machine learning (ML) has emerged as a transformative force in weather
+prediction. Unlike traditional numerical models, ML approaches generate
+forecasts directly from historical data, without solving the governing
+equations of motion. The first ML models to surpass the skill of state-of-the-art
+physical models were the graph neural network of \citet{Keis22} and
+Pangu-Weather \citep{BXZ+22}, both trained on data from ECMWF. Although
+the training of these data-driven models is computationally expensive,
+once trained they can produce forecasts at a small fraction of the
+cost of conventional numerical models. Like traditional models, ML
+weather models operate on meshes of the sphere, but they typically
+advance in much larger time steps, of order six hours rather than
+minutes, contributing to their computational efficiency.
+
+This century, the improvements to skill in the ECMWF forecast have
+been slowing, in part due to the lack of additional computer power
+in order to create ever higher resolution simulations \citep{Baue24}.
+ECMWF have developed AIFS (Artificial Intelligence Forecasting System),
+a data-driven model that has boosted ECMWF forecast performance and
+runs at higher resolution for much reduced cost. 
+
+So should physical models be abandoned? Not yet. The power of physical
+models is that they can predict situations that have not yet been
+seen, such as climate change, whereas ML models find analogues in
+the past to make predictions. The best climate models of the future
+will by a hybrid of the two. Google Scholar just returned 7.3K results
+searching for `{}``hybrid'' ``machine learning'' ``climate'''.
 
 \section{Key Messages}
 \begin{itemize}

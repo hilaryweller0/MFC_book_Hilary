@@ -94,22 +94,7 @@
 \begin_body
 
 \begin_layout Chapter
-Numerics in Meteorology:
-\begin_inset Newline newline
-\end_inset
-
-Past,
- Present and Future
-\begin_inset Argument 1
-status open
-
-\begin_layout Plain Layout
-Numerics in Meteorology
-\end_layout
-
-\end_inset
-
-
+The Evolution of Numerical Methods in Climate Prediction
 \end_layout
 
 \begin_layout Standard
@@ -121,43 +106,47 @@ Author:
  Hilary Weller
 \end_layout
 
-\begin_layout Section*
-Abstract
-\begin_inset CommandInset label
-LatexCommand label
-name "sec:abstract"
-
-\end_inset
-
-
-\end_layout
-
 \begin_layout Standard
-Meteorology is the science of weather and climate.
- The value of meteorology is prediction,
- and the most powerful predictions use large models that solve the equations governing the dynamics and physics of the atmosphere and ocean numerically.
- At the heart of these models are dynamical cores.
- The dynamical core solves the partial differential equations that predict winds,
+Detailed climate modelling is done using weather prediction models,
+ so this chapter is about the history,
+ current state and future of numerical weather prediction models.
+ At the heart of a weather or climate model is a dynamical core,
+ that solves the partial differential equations that predict winds,
  temperature,
  pressure and the moisture content of the atmosphere.
- This chapter explains why weather and climate models use the numerical methods they do.
+ This chapter explains why weather and climate models use the numerical methods that they do.
  Weather and climate models have constraints from fast waves in the atmosphere,
  from the geometry of the planet,
  from the computers that we use and from the delicate balances of atmospheric motion.
- We begin with early finite\SpecialChar nobreakdash
-difference approaches and the problem of fast waves,
+ We begin with early finite-difference approaches and the problem of fast waves,
  then show how elliptic solves,
  grid staggering,
- spectral methods and semi\SpecialChar nobreakdash
-implicit methods emerged.
+ spectral methods and semi-implicit methods emerged.
  We then turn to modern challenges:
  parallel computing,
- quasi\SpecialChar nobreakdash
-uniform spherical meshes,
- and high\SpecialChar nobreakdash
-order methods such as spectral elements and discontinuous Galerkin.
- The most important take away message is that no numerical method is perfect,
+ quasi-uniform spherical meshes,
+ and high-order methods such as spectral elements and discontinuous Galerkin,
+ with a final note on machine learning.
+ The most important take away message is that all numerical method have defects,
  but the numerical models are useful.
+ This is in the spirit of the well-known remark by 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "BD87"
+literal "false"
+
+\end_inset
+
+ that 
+\begin_inset Quotes eld
+\end_inset
+
+all models are wrong,
+ but some are useful
+\begin_inset Quotes erd
+\end_inset
+
+.
  
 \end_layout
 
@@ -5996,39 +5985,86 @@ Is Machine Learning the Future of Weather and Climate Prediction
 \end_layout
 
 \begin_layout Standard
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-todo[inline]{
-\end_layout
-
-\end_inset
-
-ML weather forecasts are great.
- Current ML models drift and usually diverge to an unrealistic state within a few weeks.
- Lots of work to do here.
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-}
-\end_layout
+Machine learning (ML) has emerged as a transformative force in weather prediction.
+ Unlike traditional numerical models,
+ ML approaches generate forecasts directly from historical data,
+ without solving the governing equations of motion.
+ The first ML models to surpass the skill of state-of-the-art physical models were the graph neural network of 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "Keis22"
+literal "false"
 
 \end_inset
 
+ and Pangu-Weather 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "BXZ+22"
+literal "false"
 
+\end_inset
+
+,
+ both trained on data from ECMWF.
+ Although the training of these data-driven models is computationally expensive,
+ once trained they can produce forecasts at a small fraction of the cost of conventional numerical models.
+ Like traditional models,
+ ML weather models operate on meshes of the sphere,
+ but they typically advance in much larger time steps,
+ of order six hours rather than minutes,
+ contributing to their computational efficiency.
 \end_layout
 
 \begin_layout Standard
-Machine learning has been a disrupter in weather prediction,
- a game changer.
- It has only recently started but is already creating some skillful forecasts with less computational power than models that solve PDEs.
+This century,
+ the improvements to skill in the ECMWF forecast have been slowing,
+ in part due to the lack of additional computer power in order to create ever higher resolution simulations 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Baue24"
+literal "false"
+
+\end_inset
+
+.
+ ECMWF have developed AIFS (Artificial Intelligence Forecasting System),
+ a data-driven model that has boosted ECMWF forecast performance and runs at higher resolution for much reduced cost.
  
+\end_layout
+
+\begin_layout Standard
+So should physical models be abandoned?
+ Not yet.
+ The power of physical models is that they can predict situations that have not yet been seen,
+ such as climate change,
+ whereas ML models find analogues in the past to make predictions.
+ The best climate models of the future will by a hybrid of the two.
+ Google Scholar just returned 7.3K results searching for `
+\begin_inset Quotes eld
+\end_inset
+
+hybrid
+\begin_inset Quotes erd
+\end_inset
+
+ 
+\begin_inset Quotes eld
+\end_inset
+
+machine learning
+\begin_inset Quotes erd
+\end_inset
+
+ 
+\begin_inset Quotes eld
+\end_inset
+
+climate
+\begin_inset Quotes erd
+\end_inset
+
+'.
 \end_layout
 
 \begin_layout Section

@@ -145,7 +145,7 @@ literal "false"
 \begin_inset CommandInset bibtex
 LatexCommand bibtex
 btprint "btPrintCited"
-bibfiles "numerics"
+bibfiles "numerics,ML"
 options "abbrvnat"
 encoding "default"
 
