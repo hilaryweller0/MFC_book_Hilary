@@ -1,0 +1,154 @@
+%% LyX 2.0.6 created this file.  For more info, see http://www.lyx.org/.
+%% Do not edit unless you really know what you are doing.
+\documentclass[12pt,british,12pt, round,comma,sort&compress]{article}
+\usepackage{mathptmx,amsmath,amssymb,mathtools,bm}
+\renewcommand{\familydefault}{\rmdefault}
+%\usepackage[T1]{fontenc}
+%\usepackage[latin9]{inputenc}
+\usepackage[a4paper]{geometry}
+\usepackage{graphicx}
+\geometry{verbose,tmargin=2cm,bmargin=2cm,lmargin=2cm,rmargin=2cm}
+\setcounter{secnumdepth}{5}
+\setcounter{tocdepth}{5}
+\setlength{\parskip}{\smallskipamount}
+\setlength{\parindent}{0pt}
+
+\makeatletter
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% User specified LaTeX commands.
+\usepackage{color}
+\newcommand{\nicefrac}[2]{\ensuremath ^{#1}\!\!/\!_{#2}}
+\usepackage { fancybox}
+
+\renewcommand{\floatpagefraction}{0.95}
+\renewcommand{\textfraction}{0}
+\renewcommand{\topfraction}{1}
+\renewcommand{\bottomfraction}{1}
+
+\usepackage{bibentry}
+\bibliographystyle{abbrvnat}
+\nobibliography{numerics}
+
+\makeatother
+
+\usepackage{babel}
+\begin{document}
+
+\title{MFC Bood Chapter ``Numerics in Meteorology''}
+\author{Hilary Weller}
+\maketitle
+
+\section{A Historical Pinnacle}
+
+\begin{itemize}
+
+\item \bibentry{DCM+05}
+
+\item \bibentry{MDW+10}
+
+\item \bibentry{AL77}
+
+\item \bibentry{Smag58} \ \\
+Appears to be plagued by grid-scale oscillations. No results presented.\\
+Two levels
+
+\item \bibentry{Smag63} \ \\
+Two levels, single temperature, stabitic stability as a parameter. Simple radiation.\\
+Equator to 64N. Run for 60 days. Simulate baroclinic instability\\
+Includes polewards heat transport, Hadley circulation\\
+Vertical sound and external gravity waves filtered by primitive equations.\\
+Finite differences (centered). Eddy diffusion\\
+dx = 555km, dt = 20 mins, 
+
+\item \bibentry{Phil59} \ \\
+Solutions presented. 
+Combination of spherical co-ordinates with polar caps\\
+Finite differnces, fully explicit, centered in time and space\\
+Interpolation between grids.\\
+Max time steop of 12.5 mins. Used dt=18.5mins. \\
+One time step took 30secs on IBM704\\
+24 hour forecast therefore takes 84 mins\\
+Explicit horizontal gravity waves\\
+dx=500.4km at the equator. Layers?\\
+Still blaming grid-scale oscillations on initial conditions rather than numberical methods
+
+\item \bibentry{SBJ+89}\ \\
+Move from grid-point model to spectral model.\\
+Semi-implicit treatment of zonal advection of vorticity and specific humidity (in Fourier space).\\
+Semi-implicit gravey-wave terms (as before)\\
+Good results with T106, 19-levels. Initially T63, 16 levels (4 processors)\\
+Spectral model operatikonal since 1983.\\
+Spectral method described by:\\
+``Bourke (1974) and Hoskins and Simmons (1975), and in particular that of the original ECMWF spectral model of Baede et al (1979).''\\
+``Reviews by Machenhauer (1979) and Jarraud and Simmons (1984)''\\
+Legendre transforms\\
+``21/2 hours to complete a 10-day forecast on a CRAY X-MP/48''\\
+FD in the vertical\\
+Lots of details about stability towards the poles. Fixes \\
+Fourth-order, implicit zonal diffusion for stability towards the poles.\\
+A conclusion: FD or FE may outperform spectral in a few years due to increased resolution and increased importance of local prediction.\\
+No semi-Lagrangian yet.
+
+\item Simmons, A. J., B. J. Hoskins, and D. M. Burridge, 1978: Stability of the Semi-Implicit Method of Time Integration. Mon. Wea. Rev., 106, 405-412, \url{https://doi.org/10.1175/1520-0493(1978)106<0405:SOTSIM>2.0.CO;2}
+
+\item \bibentry{MHSS72} \ \\
+Hemispheric runs with the GFDL model. 9 vertial levels. 2 week predictions. N=40, 270km at mid latitudes.
+
+\item \bibentry{MAB+22} \ \\
+IFS forecasts are most skillful, but other models have bettern skill when initialised with IFS initial conditions. IFS is still the most skillful, but this could be because it has the smallest initial condition shock.
+
+\item \bibentry{Char48} \ \\
+Provided the 3D primitive equations as impossible to solve numerically for weather prediction (due to fast gravity and acoustic waves) for frictionless adiabatic flow.
+\begin{eqnarray}
+\frac{D\mathbf{u}}{Dt} + 2\bm{\Omega}\times\mathbf{u} + \mathbf{g} &=&
+-\frac{1}{\rho}\nabla p\\
+\frac{D\rho}{Dt} &=&-\rho\nabla\cdot\mathbf{u} \\
+\frac{D\theta}{Dt} &=& 0
+\end{eqnarray}
+Assume hydrostatic balance and that horizontal scales dominate over vertical to get
+\begin{eqnarray}
+\frac{D_h\mathbf{v}}{Dt} + f\mathbf{k}\times\mathbf{v}  &=&
+-\frac{1}{\rho}\nabla_h p\\
+g &=& -\frac{1}{\rho}\frac{\partial p}{\partial z}
+\end{eqnarray}
+Assumptions about the atmosphere being close to geostropic give the QGPV and $\theta$ equations.
+
+\item \bibentry{Char49}\ \\
+The primitive equations are simplified to create equations for potential temperature and PV. This leads to a single equation for pressure for large-scale systems. 
+
+The atmosphere is reduced to an equivalent barotropic 2D atmosphere. Then the method is applied to predict the 500-mb height.
+
+Shortcoming of the primitive equations (as solved by Richardson): "the meteorologically importand solution of (4), ... can be found only by taking into account the entirely irrelevant gravity motions if the solution is to be obtained by numerical integration."
+
+\item \bibentry{CFvN50}\ \\
+\includegraphics[width=0.6\linewidth]{notes/CFvN50.jpg}
+
+\item \bibentry{CP53}
+
+\item \bibentry{Rich22} \ \\
+Finite differences used successfully to solve the heat eqauation\\
+Use for the weather on a grid rather than with Fourier analysis.\\
+3D\\
+Eliminate vertical velocity\\
+Centered differences\\
+5 layers with top layer centered at 200hPa.\\
+7 dependent variables - 3 velocity, density, total water content, pressure and temperature. Vertical velocity and temperature are eliminated.\\
+Hydrostatic\\
+Radiation included\\
+One layer above 11.8 km\\
+Equivant to a rotated B-grid (E grid)\\
+Huge pressure changes were calculated. Blamed on lack of smoothness of initial conditions.
+
+Staggered grid in horizontal and vertial, pressure at interfaces between layers.\\
+"step-over" method (leapfrog) with a first-order initial time step, doubling the time step "several times"
+
+\end{itemize}
+
+\section{The Pole Problem}
+
+\begin{itemize}
+\item \bibentry{ST12}
+\end{itemize}
+
+\nobibliography{numerics}
+
+\end{document}

@@ -6,7 +6,8 @@
 \origin unavailable
 \textclass book
 \begin_preamble
-\usepackage{todonotes}
+\usepackage{todonotes,epigraph}
+\setlength{\epigraphwidth}{0.7\linewidth}
 \end_preamble
 \use_default_options true
 \maintain_unincluded_children no

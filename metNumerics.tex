@@ -1,7 +1,10 @@
 
-\chapter{The Evolution of Numerical Methods in Climate Prediction}
+\chapter{The Evolution of Numerical Methods in Climate Prediction}\label{chap:climate_num}
 
 \textbf{Author:} Hilary Weller
+
+\epigraph{The story of numerical weather prediction (NWP) is a great story. It deals with the first successful attempts to see into the chaotic future, to predict non-period events. It is to a large extent a story of computers, mathematics and numerical schemes. But the development cannot be fully understood unless non-mathematical and non-technological facts are also included. Meteorological understanding, political considerations and human emotions are difficult to quantify, but they make the picture complete and the narrative more interesting for readers outside the `NWP community'.}
+{\cite{Pers05a}}
 
 Detailed climate modelling is done using weather prediction models,
 so this chapter is about the history, current state and future of
@@ -52,8 +55,9 @@ $\theta$:
 \frac{D\theta}{Dt} & =0.\label{eq:theta}
 \end{align}
 where $\bm{\Omega}$ is the rotation rate of the planet and $\mathbf{g}$
-is the acceleration due to gravity. The total derivatives, or advection
-operators of a quantity $\phi$ are defined as
+is the acceleration due to gravity (see also eqn (\ref{EulBouss-motion-eqn-Newton})).
+The total derivatives, or advection operators of a quantity $\phi$
+are defined as
 \begin{equation}
 \frac{D\phi}{Dt}=\frac{\partial\phi}{\partial t}+\mathbf{u}\cdot\nabla\phi\label{eq:linAdvect}
 \end{equation}
@@ -71,18 +75,18 @@ air parcel would reach if it were brought adiabatically to 1000~hPa
 (meteorologists love air parcels). If a volume of air near the ground
 rises, while expanding as the pressure falls, it will cool (assuming
 no other exchanges of energy between the air parcel and its surroundings),
-but its potential temperature, $\theta$, will remain the same. One
-of the wonderful aspects of potential temperature is that its transport
-equation (\ref{eq:theta}), unlike that of temperature, does not contain
-a pressure work term, that describes how temperature changes when
-the air expands or contracts. The pressure work term can make the
-equation set more difficult to solve. Another joy of potential temperature
-is that it is informative about the stability of the atmosphere. Temperature
-always decreases with height in the troposphere (below the stratosphere).
-But potential temperature usually increases or is constant. If potential
-temperature is ever found to decrease with height then the atmosphere
-will be unstable, updraughts will form, which can lead to clouds and
-precipitation.
+but its potential temperature, $\theta$, will remain the same. Potential temperature is closely related to buoyancy which is used instead in chapter \ref{chap:gfd_pdes}.
+One of the wonderful aspects of potential temperature is that its
+transport equation (\ref{eq:theta}), unlike that of temperature,
+does not contain a pressure work term, that describes how temperature
+changes when the air expands or contracts. The pressure work term
+can make the equation set more difficult to solve. Another joy of
+potential temperature is that it is informative about the stability
+of the atmosphere. Temperature always decreases with height in the
+troposphere (below the stratosphere). But potential temperature usually
+increases or is constant. If potential temperature is ever found to
+decrease with height then the atmosphere will be unstable, updraughts
+will form, which can lead to clouds and precipitation.
 
 There is an additional unknown in the primitive equation set (\ref{eq:mom}-\ref{eq:theta}),
 the pressure, $p$. Unlike the dependent variables ($\mathbf{u}$,
@@ -129,6 +133,7 @@ linear-advection equation:
 \begin{equation}
 \frac{\partial\theta}{\partial t}+u\frac{\partial\theta}{\partial x}=0.\label{eq:linAdvect1}
 \end{equation}
+(Note that this is a special case of the scalar conservation law, eq \ref{eq:cons1}.)
 If we store values of $\theta$ on a grid in an array, indexed by
 $j$, then $\theta_{j}$ is $\theta$ at position $j\Delta x$ where
 $\Delta x$ is the grid spacing. Then we can make the second-order,
@@ -225,16 +230,16 @@ is simplified:
 \begin{equation}
 \nabla\cdot\mathbf{u}=0\implies\frac{D\rho}{Dt}=0\label{eq:ico}
 \end{equation}
-which filters out acoustic waves. This is not useful for weather prediction
-because air density varies by orders of magnitude between the surface
-and the stratosphere. Also, numerical solutions including (\ref{eq:ico})
-are more difficult because you cannot just march forward; you have
-to find solutions for the components of the vector $\mathbf{u}$ that
-satisfy the momentum equation (\ref{eq:mom}) and simultaneously satisfy
-(\ref{eq:ico}). The acoustic wave speed has actually been made infitite!
-Charney's solution will be described in section \ref{subsec:ellipticSolutions}.
-First, attempt this exercise exploring time step restrictions due
-to fast waves.
+which filters out acoustic waves (eqn \ref{eq:continuity} in chapter \ref{chap_pdes_basic}).
+This is not useful for weather prediction because air density varies
+by orders of magnitude between the surface and the stratosphere. Also,
+numerical solutions including (\ref{eq:ico}) are more difficult because
+you cannot just march forward; you have to find solutions for the
+components of the vector $\mathbf{u}$ that satisfy the momentum equation
+(\ref{eq:mom}) and simultaneously satisfy (\ref{eq:ico}). The acoustic
+wave speed has actually been made infinite! Charney's solution will
+be described in section \ref{subsec:ellipticSolutions}. First, attempt
+this exercise exploring time step restrictions due to fast waves.
 
 \subsection{Example: Numerical Solution of the Shallow Water Equations}\label{subsec:solveSW}
 
@@ -375,19 +380,19 @@ in developing an explicit time-stepping method. However, the characteristic
 speeds are so fast that we actually need a numerical method similar
 to one for solving an elliptic equation. By making the incompressible
 approximation (\ref{eq:ico}) for the primitive equations, acoustic
-waves have infinite speed. This converts a time marking problem into
-a constrain problem, and makes the equations elliptic. \citet{Char48}
-derived an elliptic vorticity equation to predict the vertical component
-of the total vorticity:
+waves have infinite speed. This converts a time marching problem into
+a constraint problem, and will create an elliptic equations for the
+winds. \citet{Char48} derived a vorticity equation to predict the
+vertical component of the total vorticity:
 \begin{equation}
 \eta=\xi+f\label{eq:pv}
 \end{equation}
 where $\xi=\left(\nabla\times\mathbf{u}\right)\cdot\mathbf{k}$ is
 the vertical component of the (relative) vorticity and planetary rotation,
 or Coriolis parameter, $f$, is the planetary vorticity. Vorticity
-equations can represent slowly evolving weather regimes. To derive
-the barotropic vorticity equation, we assume incompressibility and
-take the curl of the momentum equation (\ref{eq:SWu_vec}), apply
+equations can represent slowly evolving weather regimes. (See also section \ref{subsec:vorticityBiotSavart}.)
+To derive the barotropic vorticity equation, we assume incompressibility
+and take the curl of the momentum equation (\ref{eq:SWu_vec}), apply
 some vector-calculus identities to get
 \begin{equation}
 \frac{D\eta}{Dt}=0\label{eq:baroVortEqn}
@@ -411,23 +416,25 @@ u\approx-\frac{1}{\rho f}\frac{\partial p}{\partial y},\ \  & v\approx\frac{1}{\
 Therefore the wind flows anti-clockwise, or cyclonically, around low
 pressure in the Northern hemisphere and clockwise around anti-cyclones.
 The winds advect the pressure, making it evolve slowly, making the
-weather predictable. However geostrophic balance cannot be used to
-predict the weather. Geostrophic balance (\ref{eq:geoBalance}) implies
-incompressibility and, substituting (\ref{eq:geoBalance}) into the
-momentum equation (\ref{eq:mom}) results in the wind and other variables
-never changing. This is a persistence forecast - the weather tomorrow
-will be the same as today. We don't need equations to make a persistence
-forecast. So it seems that we need need some way to ignore the ``entirely
-irrelevant gravity motions'' without assuming incompressibility or
-exact geostrophic balance. \citet{CFvN50} made the first numerical
+weather predictable. However assuming exact geostrophic balance is
+not useful for weather prediction: substituting (\ref{eq:geoBalance})
+into the momentum equation (\ref{eq:mom}) results in the wind and
+other variables never changing. This is a persistence forecast - the
+weather tomorrow will be the same as today. We don't need equations
+to make a persistence forecast. So it seems that we need need some
+way to ignore the ``entirely irrelevant gravity motions'' without
+assuming incompressibility or exact geostrophic balance. Geostrophic
+balance is not assumed in the derivation of the vorticity equation
+(\ref{eq:baroVortEqn}), but is used to find the winds from the pressure
+or the geopotential height. \citet{CFvN50} made the first numerical
 weather predictions by finding a pressure level in the atmosphere,
 $p^{*}$, where horizontal divergence is smallest. The equations are
-then formulated on this pressure surface, which has geopotential height,
-$z$. \citet{CFvN50} used $p^{*}=500\text{ hPa}$ and, to this day,
-much weather data is reported on the $500\text{ hPa}$ surface and
-ECMWF use the height of the $500\text{ hPa}$ surface, $z_{500}$,
-to verify their forecasts. Geostrophically balanced winds can be written
-in terms of $z$
+then formulated on this pressure surface, which has spatially varying
+geopotential height, $z$. \citet{CFvN50} used $p^{*}=500\text{ hPa}$
+and, to this day, much weather data is reported on the $500\text{ hPa}$
+surface and ECMWF use the height of the $500\text{ hPa}$ surface,
+$z_{500}$, to verify their forecasts. Geostrophically balanced winds
+can be written in terms of $z$
 \begin{equation}
 \mathbf{v}=-\frac{g}{f}\mathbf{k}\times\nabla z\label{eq:geoBalanceZ}
 \end{equation}
@@ -438,6 +445,8 @@ are
 \frac{D\eta}{Dt} & =0, & g\nabla\cdot\frac{1}{f}\nabla z & =\xi\label{eq:baroVortGeoVort}
 \end{align}
 to predict total vorticity, $\eta$, and geopotential height, $z$.
+The equation for $z$ is an elliptic equation and $z$ is then used
+to calculate the winds from geostrophic balance (\ref{eq:geoBalance}).
 In these equations the fast wave are eliminated, not because they
 are irrelevant, but because they can dominate numerical stability
 while contributing little to large scale weather patterns.
@@ -488,16 +497,17 @@ method}
 
 Section \ref{subsec:ellipticSolutions} described approximations of
 the hyperbolic primitive equations (\ref{eq:mom}-\ref{eq:theta})
-by the elliptic vorticity equation (\ref{eq:baroVortEqn}). The real
-atmosphere is compressible, with finite speed acoustic and gravity
-waves and non-hydrostatic motions, so for the most accurate weather
-forecasts, all of these processes need to be included, but without
-the time step being limited by the speed of the fast waves. This is
-where semi-implicit time stepping comes in. Rather than just simplifying
-the equations, the equations are written as corrections to simplified
-equations, so that the simplified, linear parts can be solved implicitly,
-leaving the corrections, which may be non-linear, or just other slow
-terms, to be solved explicitly. 
+by the vorticity equation (\ref{eq:baroVortEqn}) and an elliptic
+equation for geopotential height. The real atmosphere is compressible,
+with finite speed acoustic and gravity waves and non-hydrostatic motions,
+so for the most accurate weather forecasts, all of these processes
+need to be included, but without the time step being limited by the
+speed of the fast waves. This is where semi-implicit time stepping
+comes in. Rather than just simplifying the equations, the equations
+are written as corrections to simplified equations, so that the simplified,
+linear parts can be solved implicitly, leaving the corrections, which
+may be non-linear, or just other slow terms, to be solved explicitly.
+The semi-implicit method is both a discretisation of and a generalisation of the method for combining the momentum and continuity equations in section \ref{subsec:pressure} to form a Poisson equation for pressure to ensure that the momentum equation obeys continuity.
 
 We can solve the non-linear shallow water equations (\ref{eq:SWu_vec}-\ref{eq:SWh_vec})
 implicitly for gravity waves and explicitly for advection and Coriolis,
@@ -519,14 +529,16 @@ its explicit and implicit parts and substitute this into (\ref{eq:hSI}):
 \implies\frac{h^{(n+1)}-h^{(n)}}{\Delta t} & -\Delta tgh^{(n)}\nabla^{2}h^{(n+1)}=-\mathbf{u}^{(n)}\mathbf{\cdot}\nabla h^{(n)}-h^{(n)}\nabla\cdot\mathbf{u}^{\prime}.\label{eq:hEqn}
 \end{align}
 The first step is to calculate $\mathbf{u}^{\prime}$ explicitly from
-(\ref{eq:uPrimeEqn}). Eqn (\ref{eq:hEqn}) appears to be an elliptic
-equation for $h$ and is sometimes called the pressure equation or
-a Helmholtz equation. All of the unknown values of $h$ can be put
-into an array. The discretisation of $\nabla^{2}h$ can be represented
-as a matrix multiplied by this array. Then this matrix equation can
-be solved to find the array of all of the $h$ values. The final step
-is the back-substitution (\ref{eq:backS}), to calculate $\mathbf{u}^{(n+1)}$
-from $\mathbf{u}^{\prime}$ and the new values of $h^{(n+1)}$.
+(\ref{eq:uPrimeEqn}). Eqn (\ref{eq:hEqn}) is an elliptic equation
+for $h^{(n+1)}$ in terms of the known time-level $n$ values, and
+is sometimes called the pressure equation or a Helmholtz equation.
+All of the unknown values of $h$ can be put into an array on the
+right hand side. The discretisation of $\nabla^{2}h^{(n+1)}$ can
+be represented as a matrix multiplied by this array. Then this matrix
+equation can be solved to find the array of all of the $h^{(n+1)}$
+values. The final step is the back-substitution (\ref{eq:backS}),
+to calculate $\mathbf{u}^{(n+1)}$ from $\mathbf{u}^{\prime}$ and
+from the new values of $h^{(n+1)}$.
 
 \subsubsection{Exercise: Semi-implicit Solution of the Shallow Water Equations}\label{ex:SI_SWE}
 
@@ -561,8 +573,7 @@ left corners. Write code to create this matrix.
 \item Write code to calculate an array for the right hand side of the matrix
 equation. 
 \item In your staggered grid code for exercise \ref{ex:explicitSWE}, instead
-of updating $h$ explicitly, write some code something like:
-\bgroup\inputencoding{latin9}
+of updating $h$ explicitly, write some code something like:\bgroup\inputencoding{latin9}
 \begin{lstlisting}
 # At the top of the file:
 import numpy.linalg as la
@@ -634,9 +645,9 @@ more similar to the linearised solver.
 \item Set $g$ to zero. Then, initialising with $u=1$ everywhere will mean
 that the height equation should give identical results to the linear
 advection equation solved using FTBS. Altenatively, initilising with
-uniform $h$ will mean that the $u$ equation becomes Burger's equation,
-and the results should be identical to a solution of Burger's equation
-solved with FTBS. 
+uniform $h$ will mean that the $u$ equation becomes Burger's equation
+(\ref{eq:Burgers}), and the results should be identical to a solution
+of Burger's equation solved with FTBS. 
 \end{enumerate}
 \end{enumerate}
 \end{enumerate}
@@ -648,12 +659,19 @@ and large linear equation solvers are needed, which can be expensive.
 {\normalsize Three Dimensional Solutions on Mainframe Computers}{\normalsize\textmd{
 }}}
 
+The first operational numerical weather predictions were made in 1955
+by Carl Gustaf Rossby's team at the Swedish Meteorological and Hydrological
+Institute. These solved the two-dimensioanl barotropic vorticity equation
+on the Swedish Binary Electronic Sequence Calculator (BESK) \citep{Pers05a},
+and gave more accurate forecasts than the empirical subjective 48
+hour forecasts that preceded them.
+
 From the 1950s to the turn of the century, models of the atmosphere
-became ever more realistic and numerical weather prediction became,
-first, possible, and then ever more accurate and valuable. Looking
-back, the progress seemed easier then. The interval between the first
-paper describing a new method and an operational model was only a
-few years, and the papers had fewer authors.
+became ever more realistic and numerical weather prediction became
+ever more accurate and valuable. Looking back, the progress seemed
+easier then. The interval between the first paper describing a new
+method and an operational model was only a few years, and the papers
+had fewer authors.
 
 In the 1950s, numerical models were still plagued by oscillations
 and instabilities that were not understood. \citet{Smag58} solved

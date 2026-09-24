@@ -1,0 +1,37 @@
+\babel@toc {british}{}\relax 
+\contentsline {chapter}{\numberline {5}The Evolution of Numerical Methods in Climate Prediction}{3}{chapter.5}%
+\contentsline {section}{\numberline {5.1}The Early Days of Numerical Weather Prediction}{4}{section.5.1}%
+\contentsline {subsection}{\numberline {5.1.1}L. F. Richardson's First Forecast and the Primitive Equations }{4}{subsection.5.1.1}%
+\contentsline {subsection}{\numberline {5.1.2}Finite Differences}{5}{subsection.5.1.2}%
+\contentsline {subsection}{\numberline {5.1.3}Exercise: Numerical Solution of the Linear Advection Equation}{6}{subsection.5.1.3}%
+\contentsline {section}{\numberline {5.2}Taming Fast Waves}{6}{section.5.2}%
+\contentsline {subsection}{\numberline {5.2.1}Example: Numerical Solution of the Shallow Water Equations}{7}{subsection.5.2.1}%
+\contentsline {subsubsection}{\numberline {5.2.1.1}Exercises: Numerical Solution of the Linearised Shallow Water Equations}{8}{subsubsection.5.2.1.1}%
+\contentsline {subsection}{\numberline {5.2.2}Solving Elliptic Equations}{9}{subsection.5.2.2}%
+\contentsline {subsubsection}{\numberline {5.2.2.1}Mathematical Exercises: Vorticity Equations and Geostrophic Balance}{10}{subsubsection.5.2.2.1}%
+\contentsline {subsubsection}{\numberline {5.2.2.2}Coding Exercise: Vorticity Inversion}{11}{subsubsection.5.2.2.2}%
+\contentsline {subsection}{\numberline {5.2.3}Elliptic Solutions of Hyperbolic Equations -- the semi-implicit method}{11}{subsection.5.2.3}%
+\contentsline {subsubsection}{\numberline {5.2.3.1}Exercise: Semi-implicit Solution of the Shallow Water Equations}{12}{subsubsection.5.2.3.1}%
+\contentsline {section}{\numberline {5.3}A Golden Era of Numerical Weather Prediction}{14}{section.5.3}%
+\contentsline {subsection}{\numberline {5.3.1}Arakawa's Numerics}{15}{subsection.5.3.1}%
+\contentsline {subsubsection}{\numberline {5.3.1.1}Exercise: Two dimensional Shallow Water Equation Solutions}{16}{subsubsection.5.3.1.1}%
+\contentsline {subsection}{\numberline {5.3.2}The Spectral Method}{16}{subsection.5.3.2}%
+\contentsline {subsubsection}{\numberline {5.3.2.1}Linear Advection using the Spectral Method}{17}{subsubsection.5.3.2.1}%
+\contentsline {subsubsection}{\numberline {5.3.2.2}Non-linear Advection using the Spectral Method}{18}{subsubsection.5.3.2.2}%
+\contentsline {subsubsection}{\numberline {5.3.2.3}Spectral Method Exercises}{18}{subsubsection.5.3.2.3}%
+\contentsline {subsection}{\numberline {5.3.3}Semi-Lagrangian Advection}{18}{subsection.5.3.3}%
+\contentsline {subsubsection}{\numberline {5.3.3.1}Semi-Lagrangian Exercise}{19}{subsubsection.5.3.3.1}%
+\contentsline {section}{\numberline {5.4}The Pole Problem and Parallel Computing}{19}{section.5.4}%
+\contentsline {subsection}{\numberline {5.4.1}Modern Parallel Computers}{20}{subsection.5.4.1}%
+\contentsline {subsection}{\numberline {5.4.2}Meshes of the Sphere}{20}{subsection.5.4.2}%
+\contentsline {section}{\numberline {5.5}Numerical Methods for the Future}{21}{section.5.5}%
+\contentsline {subsection}{\numberline {5.5.1}Finite volumes}{21}{subsection.5.5.1}%
+\contentsline {subsubsection}{\numberline {5.5.1.1}Exercise: Equivalence of Finite Volume and Finite Difference}{22}{subsubsection.5.5.1.1}%
+\contentsline {subsection}{\numberline {5.5.2}Flux-form Semi-Lagrangian}{23}{subsection.5.5.2}%
+\contentsline {subsubsection}{\numberline {5.5.2.1}Exercises: Finite Volume Solutions of the Advection Equation}{23}{subsubsection.5.5.2.1}%
+\contentsline {subsection}{\numberline {5.5.3}Finite Volume A- and C-grids for unstructured meshes}{24}{subsection.5.5.3}%
+\contentsline {subsection}{\numberline {5.5.4}Spectral Elements}{25}{subsection.5.5.4}%
+\contentsline {subsection}{\numberline {5.5.5}Discontinuous Galerkin}{26}{subsection.5.5.5}%
+\contentsline {subsection}{\numberline {5.5.6}Mixed Finite Elements}{26}{subsection.5.5.6}%
+\contentsline {section}{\numberline {5.6}Is Machine Learning the Future of Weather and Climate Prediction}{27}{section.5.6}%
+\contentsline {section}{\numberline {5.7}Key Messages}{27}{section.5.7}%
