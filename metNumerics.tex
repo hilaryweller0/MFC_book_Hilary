@@ -1,5 +1,5 @@
-
-\chapter{The Evolution of Numerical Methods in Climate Prediction}\label{chap:climate_num}
+\chapter{The Evolution of Numerical Methods in Climate Prediction}
+\label{chap:climate_num}
 
 \textbf{Author:} Hilary Weller
 
@@ -21,7 +21,7 @@ grid staggering, spectral methods and semi-implicit methods emerged.
 We then turn to modern challenges: parallel computing, quasi-uniform
 spherical meshes, and high-order methods such as spectral elements
 and discontinuous Galerkin, with a final note on machine learning.
-The most important take away message is that all numerical method
+The most important take away message is that all numerical methods
 have defects, but the numerical models are useful. This is in the
 spirit of the well-known remark by \citet{BD87} that ``all models
 are wrong, but some are useful''. 
@@ -54,17 +54,16 @@ $\theta$:
 \frac{D\rho}{Dt} & =-\rho\nabla\cdot\mathbf{u}\label{eq:cont}\\
 \frac{D\theta}{Dt} & =0.\label{eq:theta}
 \end{align}
-where $\bm{\Omega}$ is the rotation rate of the planet and $\mathbf{g}$
-is the acceleration due to gravity (see also eqn (\ref{EulBouss-motion-eqn-Newton})).
-The total derivatives, or advection operators of a quantity $\phi$
-are defined as
+where $p$ is the pressure, $\bm{\Omega}$ is the rotation rate of
+the planet and $\mathbf{g}$ is the acceleration due to gravity (see also eqn (\ref{EulBouss-motion-eqn-Newton})).
+The total derivative of a quantity $\phi$ is
 \begin{equation}
 \frac{D\phi}{Dt}=\frac{\partial\phi}{\partial t}+\mathbf{u}\cdot\nabla\phi\label{eq:linAdvect}
 \end{equation}
-which represents the rate of change of $\phi$ following with the
-wind, rather than the rate of change at a fixed point, $\partial\phi/\partial t$,
-advection being movement by the wind. The potential temperature, $\theta$,
-is a wonderful meteorological concept
+which represents the rate of change of $\phi$ following the wind,
+rather than the rate of change at a fixed point, $\partial\phi/\partial t$.
+The potential temperature, $\theta$, is a wonderful meteorological
+concept
 \begin{equation}
 \theta=T\left(p_{0}/p\right)^{R/c_{p}}
 \end{equation}
@@ -107,19 +106,21 @@ from foliage, and he made the excellent hydrostatic assumption
 \begin{equation}
 \frac{\partial p}{\partial z}=-\rho g\label{eq:hydrostatic}
 \end{equation}
-where $z$ is the local vertical direction and $g$ is the magnitude
-of the acceleration due to gravity. Eqn (\ref{eq:hydrostatic}) can
-be used, with the continuity equation (\ref{eq:cont}) to eliminate
-the vertical velocity, $w$. 
+where $z$ is the height and $g$ is the magnitude of the acceleration
+due to gravity. Eqn (\ref{eq:hydrostatic}) is a simplification of
+the vertical component of (\ref{eq:mom}), and can be used, with the
+continuity equation (\ref{eq:cont}), to eliminate the vertical velocity,
+$w$ entirely from the equation set. 
 
 Richardson was optimistic because he classified weather prediction
 as a ``marching'' problem (or hyperbolic, in PDE terms), with information
 propagating from the initial conditions and from the boundaries, as
 opposed to a ``jury'' problem, in which ``jurymen'' sitting at
-the boundary must all agree simultaneously on then solution (elliptic).
-This classification was correct, but the fast characteristic speeds
-of gravity waves, means that numerical methods for solving elliptic
-problems are beneficial for solving the primitive equations.
+the boundary must all agree simultaneously on the solution (elliptic).
+This classification was correct, but information actually propagates
+so quickly (in the form of gravity and acoustic waves) that numerical
+methods involving simultaneous solutions of equations are needed (which
+will be described in section \ref{subsec:ellipticSolutions}).
 
 \subsection{Finite Differences}
 
@@ -157,9 +158,12 @@ This is the explicit, centered in time, centered in space (CTCS) advection
 scheme (explicit meaning that the solution at the next time level
 is found from existing solutions). \citet{Rich22} described a few
 alternatives for what to do at the very first time step, when you
-do not know values from two previous time levels, only one. This cost
-effective scheme is not used much anymore as it generates solutions
-with oscillations, which will be demonstrated in the following exercise.
+do not know values from two previous time levels, only one. Even though
+this scheme is cost effective, it is not used much anymore as it generates
+solutions with oscillations, which will be demonstrated in the exercise
+below (section \ref{subsec:Ex_CTCSadvection}). Schemes for advection
+that give smoother solutions are described in sections \ref{subsec:SL}
+and \ref{subsec:FFSL}.
 
 \subsection{Exercise: Numerical Solution of the Linear Advection Equation}\label{subsec:Ex_CTCSadvection}
 
@@ -192,10 +196,10 @@ conditions? What do the discontinuities do to the solution? Why?
 \item Next try setting the Courant number to be 1.1 and plot the solution
 after 3, 4 and 5 time steps. What is happening now? Why?
 \item Using CTCS, oscillations are generated where the initial conditions
-are discontinuous, even when the Courant number is below one. A solution
-is to use a spatial discretisation that takes information from upwind
-only, not from downwind. The first-order accurate, forward in time,
-backward in space (FTBS) scheme will always give smooth solutions
+are discontinuous, even when the Courant number is below one. Part
+of the solution is to use a spatial discretisation that takes information
+from upwind, not from downwind. The first-order accurate, forward
+in time, backward in space (FTBS) scheme will always give smooth solutions
 for Courant numbers less than one (and for $u>0$)
 \begin{equation}
 \theta_{j}^{(n+1)}=\theta_{j}^{(n)}-\frac{u\Delta t}{\Delta x}\left(\theta_{j}^{(n)}-\theta_{j-1}^{(n)}\right).
@@ -205,7 +209,7 @@ Code up FTBS and compare the solutions with CTCS.
 The solutions of this exercise fit with the key take away message
 is that no numerical method is perfect, but the numerical models are
 useful. CTCS is more accurate than FTBS but the solutions can contain
-oscillations, which are not generated by FTBS. Both schemes are chap
+oscillations, which is not the case for FTBS. Both schemes are cheap
 but unstable for Courant numbers greater than one.
 
 \section{Taming Fast Waves}
@@ -217,21 +221,20 @@ and gravity waves. Deep gravity waves, in which large regions of the
 atmosphere move up and down under the influence of gravity (like waves
 on the surface of the ocean) can propagate horizontally at similar
 speed to acoustic waves. Fast waves do not carry much meteorological
-information, but they can dominate the numerical stability of weather
-models if not handled properly. The simplest numerical methods are
-explicit. This means that solutions for the next time level are found
-from previous solutions. The combination of an explicit method and
+information, but they can dominate the numerical stability if not
+handled properly. The combination of a simple explicit method and
 local finite differences means that time steps have to be small to
 avoid unstable oscillations; waves cannot travel more than about one
 grid box in one time step to avoid instability. Charney pointed out
 that aerodynamics had become tractable, in part by assuming that the
-air is close to incompressible, so the continuity equation (\ref{eq:cont})
-is simplified:
+air is close to incompressible, which filters out acoustic waves.
+Under incompressibility, the continuity equation (\ref{eq:cont})
+becomes:
 \begin{equation}
 \nabla\cdot\mathbf{u}=0\implies\frac{D\rho}{Dt}=0\label{eq:ico}
 \end{equation}
-which filters out acoustic waves (eqn \ref{eq:continuity} in chapter \ref{chap_pdes_basic}).
-This is not useful for weather prediction because air density varies
+(eqn \ref{eq:continuity} in chapter \ref{chap:pdes_basic}). However
+this is not useful for weather prediction because air density varies
 by orders of magnitude between the surface and the stratosphere. Also,
 numerical solutions including (\ref{eq:ico}) are more difficult because
 you cannot just march forward; you have to find solutions for the
@@ -249,8 +252,10 @@ to produce the shallow water equations:
 \frac{D\mathbf{u}}{Dt}+2\bm{\Omega}\times\mathbf{u} & =-g\nabla h\label{eq:SWu_vec}\\
 \frac{Dh}{Dt} & =-h\nabla\cdot\mathbf{u}\label{eq:SWh_vec}
 \end{align}
-If we consider a local tangent plane to the sphere with $g=|\mathbf{g}|$,
-$\mathbf{u}=(u,v)$ then the shallow water equations can be written
+where $\bm{\Omega}=\left(0,0,f\right)^{T}$ is the local vertical
+component of the planetary rotation (Coriolis). If we consider a local
+tangent plane to the sphere with $g=|\mathbf{g}|$, $\mathbf{u}=(u,v)$
+then the shallow water equations can be written
 \begin{align}
 \frac{Du}{Dt}-fv & =-g\frac{\partial h}{\partial x}\label{eq:SWu}\\
 \frac{Dv}{Dt}+fu & =-g\frac{\partial h}{\partial y}\label{eq:SWv}\\
@@ -270,10 +275,12 @@ wave equation
 which has gravity wave speed $\sqrt{gH}$. If the mean fluid depth,
 $H$, is, for example, the height of the troposphere, around 10~km,
 and $g\sim10\text{ m/s}$ then the gravity wave speed is 316~m/s,
-close to the speed of sound which is around 343~m/s. The linearised
+close to the speed of sound which is around 343~m/s. This linearisation
+is a good approximation when $h<<H$ and when $u,v<<\sqrt{gH}$ which
+occurs if we consider the entire troposphere as one layer. The linearised
 shallow water equations can be solved explicitly using finite differences
 on a staggered grid, with $u$ and $h$ stored at alternating locations
-\citep[an excellent choice made by][]{Rich22}
+\citep[similar to the excellent choice made by][]{Rich22}
 \begin{align}
 \frac{h_{j}^{(n+1)}-h_{j}^{(n)}}{\Delta t} & =-H\frac{u_{j+1/2}^{(n)}-u_{j-1/2}^{(n)}}{\Delta x}\label{eq:linSWh_FB_C}\\
 \frac{u_{j+1/2}^{(n+1)}-u_{j+1/2}^{(n)}}{\Delta t} & =-g\frac{h_{j+1}^{(n+1)}-h_{j}^{(n+1)}}{\Delta x}\label{eq:linSWu_FB_C}
@@ -282,18 +289,18 @@ where $\Delta t$ is the time step and $n$ is the time level number
 so that $t=n\Delta t$ is the time. The values of $u$ and $h$ are
 stored in arrays indexed by an integer $j$. The array for $h$ at
 index $j$ represents $h$ at location $j\Delta x$, where $\Delta x$
-is the grid spacing. However the array for $u$ at grid point $j$
+is the grid spacing. However, the array for $u$ at grid point $j$
 will actually represent $u$ at location $\left(j+1/2\right)\Delta x$.
 Eqn (\ref{eq:linSWh_FB_C}) can be rearranged to give $h_{j}^{(n+1)}$
 at every grid point using a forward difference in time (the time derivative
 at time $n$ is approximated using time $n$ and the forward time,
 $n+1$). Once we know $h_{j}^{(n+1)}$, this is used to update each
 $u_{j+1/2}^{(n+1)}$ using an explicit backward time difference. The
-resulting explicit time stepping scheme is called forward-backwards
-\citep{Mes77} and it is stable provided the Courant number associated
-with gravity waves, $c=\sqrt{gH}\Delta t/\Delta x\le1$. \citet{Rich22}
-used $\Delta t=6\text{ hours}$ and $\Delta x=200\text{ km}$. Could
-this have been part of the problem with his forecast?
+time stepping in (\ref{eq:linSWh_FB_C},\ref{eq:linSWu_FB_C}) is
+called forward-backward \citep{Mes77} and it is stable provided the
+Courant number associated with gravity waves, $c=\sqrt{gH}\Delta t/\Delta x\le1$.
+\citet{Rich22} used $\Delta t=6\text{ hours}$ and $\Delta x=200\text{ km}$.
+Could this have been part of the problem with his forecast?
 
 \subsubsection{Exercises: Numerical Solution of the Linearised Shallow Water Equations}\label{ex:explicitSWE}
 \begin{enumerate}
@@ -306,7 +313,7 @@ using the forward-backward time-stepping on a staggered grid (\ref{eq:linSWh_FB_
 in the periodic domain $x\in[0,L)$ using the setup:
 \[
 \begin{array}{c}
-\Delta x=2\times10^{5}\text{ m},\ g=10\text{ m/s},\ L=8\times10^{6}\text{ m},\ H=10\times10^{3}\text{ m}\\
+\Delta x=2\times10^{5}\text{ m},\ g=10\text{ m}^{2}\text{s}^{-1},\ L=8\times10^{6}\text{ m},\ H=10\times10^{3}\text{ m}\\
 \begin{array}{cc}
 u\left(x,t=0\right),\  & h\left(x,t=0\right)=\begin{cases}
 \frac{1}{2}\left(1-\cos\frac{6\pi\left(x-L/3\right)}{L}\right) & \text{for }x\in\left[L/3,\ 2L/3\right]\\
@@ -322,8 +329,9 @@ the same total duration (so you will need many more, much smaller
 time steps).
 \item The analytic solution returns to the initial conditions after one
 complete revolution of the periodic domain. Run your model for exactly
-one revolution by choosing a time step so that the number of time
-steps is twice the number of points in space. 
+one revolution by choosing spatial and temporal resolutions so that
+the Courant number is less that one (for example if number of time
+steps is twice the number of points in space). 
 \begin{enumerate}
 \item Once you have a simulation that returns approximately to the initial
 conditions, you can calculate the normalised root mean square error
@@ -372,18 +380,26 @@ What solution would you expect?
 
 \subsection{Solving Elliptic Equations}\label{subsec:ellipticSolutions}
 
-The primitive equations (\ref{eq:mom}-\ref{eq:theta}), the linear
-advection equations (\ref{eq:linAdvect1}) and the shallow water equations
-(\ref{eq:SWu_vec}-\ref{eq:SWh_vec}) are hyperbolic, meaning that
-information propagates at a finite speed. This encouraged Richardson
-in developing an explicit time-stepping method. However, the characteristic
-speeds are so fast that we actually need a numerical method similar
-to one for solving an elliptic equation. By making the incompressible
-approximation (\ref{eq:ico}) for the primitive equations, acoustic
+We saw in section \ref{subsec:solveSW} that time steps have to be
+very small for stable solutions of hyperbolic equations such as the
+shallow water equations (\ref{eq:SWu_vec}-\ref{eq:SWh_vec}) using
+explicit methods. For hyperbolic systems, information propagates at
+finite speed, so purely explicit schemes can be stable for small enough
+time steps. This hyperbolic property of the primitive equations (\ref{eq:mom}-\ref{eq:theta}),
+encouraged Richardson to develop an explicit time-stepping method.
+However, the wave speeds are so fast that explicit time-stepping leads
+to overly restrictive time step limits. Therefore we actually need
+a numerical method similar to one for solving an elliptic equation,
+an implicit method, to enable longer stable time steps. Implicit methods
+were first used to solve approximations of the primitive equations
+using the incompressible approximation (\ref{eq:ico}), in which acoustic
 waves have infinite speed. This converts a time marching problem into
 a constraint problem, and will create an elliptic equations for the
-winds. \citet{Char48} derived a vorticity equation to predict the
-vertical component of the total vorticity:
+winds.
+
+In order to create a stable solution method along these lines, \citet{Char48}
+derived a vorticity equation to predict the vertical component of
+the total vorticity:
 \begin{equation}
 \eta=\xi+f\label{eq:pv}
 \end{equation}
@@ -416,7 +432,7 @@ u\approx-\frac{1}{\rho f}\frac{\partial p}{\partial y},\ \  & v\approx\frac{1}{\
 Therefore the wind flows anti-clockwise, or cyclonically, around low
 pressure in the Northern hemisphere and clockwise around anti-cyclones.
 The winds advect the pressure, making it evolve slowly, making the
-weather predictable. However assuming exact geostrophic balance is
+weather predictable. However, assuming exact geostrophic balance is
 not useful for weather prediction: substituting (\ref{eq:geoBalance})
 into the momentum equation (\ref{eq:mom}) results in the wind and
 other variables never changing. This is a persistence forecast - the
@@ -424,21 +440,21 @@ weather tomorrow will be the same as today. We don't need equations
 to make a persistence forecast. So it seems that we need need some
 way to ignore the ``entirely irrelevant gravity motions'' without
 assuming incompressibility or exact geostrophic balance. Geostrophic
-balance is not assumed in the derivation of the vorticity equation
-(\ref{eq:baroVortEqn}), but is used to find the winds from the pressure
-or the geopotential height. \citet{CFvN50} made the first numerical
-weather predictions by finding a pressure level in the atmosphere,
-$p^{*}$, where horizontal divergence is smallest. The equations are
-then formulated on this pressure surface, which has spatially varying
-geopotential height, $z$. \citet{CFvN50} used $p^{*}=500\text{ hPa}$
-and, to this day, much weather data is reported on the $500\text{ hPa}$
-surface and ECMWF use the height of the $500\text{ hPa}$ surface,
-$z_{500}$, to verify their forecasts. Geostrophically balanced winds
-can be written in terms of $z$
+balance is\textit{ not assumed} in the derivation of the vorticity
+equation (\ref{eq:baroVortEqn}), but is used to find the winds from
+the pressure or the geopotential height, which seems like an inconsistency.
+\citet{CFvN50} made the first numerical weather predictions by finding
+a pressure level in the atmosphere, $p^{*}$, where horizontal divergence
+is smallest. The equations are then formulated on this pressure surface,
+which has spatially varying geopotential height, $z$. \citet{CFvN50}
+used $p^{*}=500\text{ hPa}$ and, to this day, much weather data is
+reported on the $500\text{ hPa}$ surface and ECMWF use the height
+of the $500\text{ hPa}$ surface, $z_{500}$, to verify their forecasts.
+Geostrophically balanced winds can be written in terms of $z$
 \begin{equation}
 \mathbf{v}=-\frac{g}{f}\mathbf{k}\times\nabla z\label{eq:geoBalanceZ}
 \end{equation}
-where $\mathbf{v}$ is the horizontal component of the wind. Hence
+where $\mathbf{v}$ is the horizontal component of the wind. Hence,
 the two equations to be solved for the simplest weather prediction
 are
 \begin{align}
@@ -447,15 +463,17 @@ are
 to predict total vorticity, $\eta$, and geopotential height, $z$.
 The equation for $z$ is an elliptic equation and $z$ is then used
 to calculate the winds from geostrophic balance (\ref{eq:geoBalance}).
-In these equations the fast wave are eliminated, not because they
+In these equations, the fast wave are eliminated, not because they
 are irrelevant, but because they can dominate numerical stability
-while contributing little to large scale weather patterns.
+while contributing little to large scale weather patterns. Similar
+methods are used when relaxing the incompressibility assumption and
+treating the resulting fast waves stably (section \ref{subsec:SI}).
 
 \subsubsection{Mathematical Exercises: Vorticity Equations and Geostrophic Balance}
 \begin{enumerate}
 \item Derive the barotropic vorticity equation (\ref{eq:baroVortEqn}) for
 two-dimensional flow, $\mathbf{u}=\left(u,v,0\right)^{T}$, by taking
-the curl of (\ref{eq:SWu_vec}), assuming incompressibilty ($\nabla\cdot\mathbf{u}=\frac{\partial u}{\partial y}+\frac{\partial v}{\partial y}=0$),
+the curl of (\ref{eq:SWu_vec}), assuming incompressibility ($\nabla\cdot\mathbf{u}=\frac{\partial u}{\partial x}+\frac{\partial v}{\partial y}=0$),
 uniform $h$ and using the vector calculus identities:
 \begin{itemize}
 \item $\mathbf{u}\cdot\nabla\mathbf{u}=\left(\nabla\times\mathbf{u}\right)\times\mathbf{u}+\nabla\frac{|\mathbf{u}|^{2}}{2}$
@@ -493,7 +511,7 @@ using a finite difference scheme in 1D. Check your answer by calculating
 vorticity from $z$. Boundary conditions and initial vorticity ...}
 
 \subsection{Elliptic Solutions of Hyperbolic Equations -- the semi-implicit
-method}
+method}\label{subsec:SI}
 
 Section \ref{subsec:ellipticSolutions} described approximations of
 the hyperbolic primitive equations (\ref{eq:mom}-\ref{eq:theta})
@@ -529,7 +547,8 @@ its explicit and implicit parts and substitute this into (\ref{eq:hSI}):
 \implies\frac{h^{(n+1)}-h^{(n)}}{\Delta t} & -\Delta tgh^{(n)}\nabla^{2}h^{(n+1)}=-\mathbf{u}^{(n)}\mathbf{\cdot}\nabla h^{(n)}-h^{(n)}\nabla\cdot\mathbf{u}^{\prime}.\label{eq:hEqn}
 \end{align}
 The first step is to calculate $\mathbf{u}^{\prime}$ explicitly from
-(\ref{eq:uPrimeEqn}). Eqn (\ref{eq:hEqn}) is an elliptic equation
+(\ref{eq:uPrimeEqn}), followed by an implicit solution of (\ref{eq:hEqn})
+to find $h^{(n+1)}$. Eqn (\ref{eq:hEqn}) is an elliptic equation
 for $h^{(n+1)}$ in terms of the known time-level $n$ values, and
 is sometimes called the pressure equation or a Helmholtz equation.
 All of the unknown values of $h$ can be put into an array on the
@@ -546,7 +565,7 @@ This exercise builds on the code written in exercise \ref{ex:explicitSWE}
 to solve the linearised shallow water equations (\ref{eq:linSWu}-\ref{eq:linSWh})
 explicitly, which led to time step restrictions. The first task is
 to solve the linearise, one-dimensional equations implicitly, then
-to add the non-linear terms and solve semi-implicitl\#y. 
+to add the non-linear terms and solve semi-implicitly. 
 \begin{enumerate}
 \item The explicit solution of the shallow water equations on a staggered
 grid is in eqns (\ref{eq:linSWh_FB_C}\ref{eq:linSWu_FB_C}). This
@@ -573,7 +592,7 @@ left corners. Write code to create this matrix.
 \item Write code to calculate an array for the right hand side of the matrix
 equation. 
 \item In your staggered grid code for exercise \ref{ex:explicitSWE}, instead
-of updating $h$ explicitly, write some code something like:\bgroup\inputencoding{latin9}
+of updating $h$ explicitly, write some code something like:
 \begin{lstlisting}
 # At the top of the file:
 import numpy.linalg as la
@@ -595,7 +614,6 @@ for j in range(nx):
    h = la.solve(A, RHS)      # Solve the pressure eqauation for h
    u -= dt*g/dx*(...         # Update u using the new h
 \end{lstlisting}
-\leavevmode\egroup
 \item Test your implicit code by running the same test cases as you ran
 for the explicit code. The solutions should be similar for gravity
 wave Courant numbers less than one and stable for larger gravity wave
@@ -661,7 +679,7 @@ and large linear equation solvers are needed, which can be expensive.
 
 The first operational numerical weather predictions were made in 1955
 by Carl Gustaf Rossby's team at the Swedish Meteorological and Hydrological
-Institute. These solved the two-dimensioanl barotropic vorticity equation
+Institute. These solved the two-dimensional barotropic vorticity equation
 on the Swedish Binary Electronic Sequence Calculator (BESK) \citep{Pers05a},
 and gave more accurate forecasts than the empirical subjective 48
 hour forecasts that preceded them.
@@ -677,41 +695,42 @@ In the 1950s, numerical models were still plagued by oscillations
 and instabilities that were not understood. \citet{Smag58} solved
 the the primitive equations in three dimensions (with just two vertical
 levels). But the paper mostly discusses causes of instability and
-no plots of numerical results are presented, suggesting that there
-was little realism in the results. \citet{Phil59} simulated the entire
-northern hemisphere with one horizontal layer, with a 24 hour simulation
-taking 84 minutes. Like \citet{Rich22}, \citet{Phil59} was still
-blaming grid-scale oscillations on the lack of smoothness in the initial
-conditions, rather than blaming the numerical methods. However in
+no plots of numerical results are presented. \citet{Phil59} simulated
+the entire northern hemisphere with one horizontal layer, with a 24
+hour simulation taking 84 minutes. Like \citet{Rich22}, \citet{Phil59}
+was still blaming grid-scale oscillations on the lack of smoothness
+in the initial conditions, rather than blaming the numerical methods.
+\citet{Smag63} created a two-layer model between the equator and
+64\textsuperscript{o}N which he was able to run for 60 days, simulating
+baroclinic instability, poleward heat transport and a Hadley circulation,
+with some realism. Grid-scale oscillations were controlled using eddy
+viscosity to mimic the effects of turbulent diffusion. However, in
 reality, turbulent diffusion is tiny above the surface boundary layer,
-which is only about a kilometre deep. \citet{Smag63} created a two-layer
-model between the equator and 64\textsuperscript{o}N which he was
-able to run for 60 days, simulating baroclinic instability, poleward
-heat transport and a Hadley circulation, with some realism. Grid-scale
-oscillations were controlled using eddy viscosity to mimic the effects
-of turbulent diffusion. \citet{Smag63} mentioned Arakawa's emerging
-work on energy conserving methods which would prove revolutionary
-in atmosphere and ocean modelling. The first UK Met Office numerical
-forecast was produced in 1965 on a Comet computer \citep{MOhistory26}
-which solved a three-level vorticity equation and used geostrophically
-balanced initial winds in order to avoid noisy initial conditions
-\citep{BW61}. Arakawa's work was necessary in order to move from
-vorticity equations to the stable solution of momentum equations,
-which is described in the next section.
+which is only about a kilometre deep. The use of eddy viscosity to
+control numerical oscillations was a cheat. \citet{Smag63} suspected
+that Arakawa's emerging work on energy conserving methods which would
+prove revolutionary in atmosphere and ocean modelling. The first UK
+Met Office numerical forecast was produced in 1965 on a Comet computer
+\citep{Pers05c,MOhistory26} which solved a three-level vorticity
+equation and used geostrophically balanced initial winds in order
+to avoid noisy initial conditions \citep{BW61}. Arakawa's work was
+necessary in order to move from vorticity equations to the stable
+solution of momentum equations, which is described in the next section.
 
 \subsection{Arakawa's Numerics}\label{subsec:ArakawaGrids}
 
-The Arakawa grids A-E \citep{AL77} are a selection of options of
-where pressure and velocity are stored on a grid (figure \ref{fig:Arakawa-A-E}).
+The Arakawa grids A-E \citep{AL77} are a set of options of where
+pressure and velocity are stored on a grid (figure \ref{fig:Arakawa-A-E}).
 They give different compromises in terms of simplicity, accurate wave
 propagation and representation of geostrophic balance. They are still
 hotly debated and there is no overall best option. \citet{AL77} described
 the numerical methods used on the UCLA general circulation model;
 a landmark in the development of stable and accurate numerical methods
-for the atmosphere, a 92 page article that is still being cited (3,538
-citations in total, with over 100 citations every year since 2014).
-The model was three dimensional with 12 vertical levels, $72\times45$
-grid points in the horizontal and a time step of 6 minutes.
+for the atmosphere, a 92 page article that is still being cited (3,612
+citations in total on 23 Sept 2026, with over 100 citations every
+year since 2014). The model was three dimensional with 12 vertical
+levels, $72\times45$ grid points in the horizontal and a time step
+of 6 minutes.
 
 \begin{figure}
 \begin{tabular}{ccccc}
@@ -733,29 +752,30 @@ to understand the following argument, with reference to figure \ref{fig:Arakawa-
 As was investigated in example \ref{subsec:solveSW}, if all variables
 are located together, as in the A-grid, then the pressure (or height)
 gradients needed to update the velocity, are calculated over three
-grid points, missing the central location (eqn \ref{eq:linSWu_FB_A})
-and the divergence needed to update the height in (\ref{eq:SWh})
-is calculated over three points in each direction, missing the central
-location (eqn \ref{eq:linSWh_FB_A}). This omission of the central
-location means that grid-scale oscillations can develop -- oscillations
-in $h$ can be present which do not lead to height gradients, and
-oscillations in $u$ and $v$ can be present which do not lead to
-divergence. These oscillations are spurious computational modes and
-make the A-grid problematic for atmospheric modelling. Considering
+grid points, missing the central location (eqn \ref{eq:linSWu_FB_A}).
+Extending the arguments to two dimensions, we can consider how the
+divergence needed to update the height in (\ref{eq:SWh}) is calculated.
+Using the A-grid, this divergence is calculated over three points
+in each direction, missing the central location (eqn \ref{eq:linSWh_FB_A}).
+This omission of the central location means that grid-scale oscillations
+can develop -- oscillations in $h$ can be present which do not lead
+to height gradients, and oscillations in $u$ and $v$ can be present
+which do not lead to divergence. These oscillations are spurious computational
+modes and make the A-grid problematic for atmospheric modelling. Considering
 the height gradients and the divergence terms of the shallow water
 equations, the C-grid appears to be ideal -- compact height gradients
 in the $x$-direction (using two points without missing out a central
-point), are centered at the $u$ location, compact height gradients
+point) are centered at the $u$ location, compact height gradients
 in the $y$-direction are at the $v$ location and the divergence
 can be calculated at the $h$ location without missing any velocities
 at $h$. This means that gravity wave propagation is most accurate
 and free of computational modes on the C-grid, and this grid was chosen
 by \citet{AL77} for the UCLA model. 
 
-Gravity waves are not the only phenomena being modelled. The Coriolis
-term also needs to be represented accurately. If we consider only
-the rates of change and the Coriolis terms, we get equations for inertial
-oscillations
+The C-grid is not perfect, partly because gravity waves are not the
+only phenomena being modelled. The Coriolis term also needs to be
+represented accurately. If we consider only the rates of change and
+the Coriolis terms, we get equations for inertial oscillations
 \begin{align}
 \frac{\partial u}{\partial t} & =fv & \frac{\partial v}{\partial t} & =-fu\label{eq:inertialOsc}
 \end{align}
@@ -771,27 +791,29 @@ and $y=j\Delta y$, $u$ will be stored at $\left(i\pm1/2,j\right)$
 and $v$ at $\left(i,j\pm1/2\right)$. This means that a lot of averaging
 is needed in the Coriolis term to update the velocity. This averaging
 reduces accuracy and enables spurious computational modes at coarse
-resolution, but the accurate representation of gravity waves has proven
-to be more important for atmospheric modelling. This may seem counter
-intuitive, considering that \citet{CFvN50} described these waves
-as ``entirely irrelevant gravity motions''. They are not irrelevant.
-They are the mechanism by which the flow comes into geostrophic balance
--- if there is a region of high height but no flow at the edge, then
-gravity waves will radiate out, flow will be created and the fluid
-will move towards geostrophic balance (a process called geostrophic
-adjustment). If gravity waves are filtered then this process is assumed
-to happen instantaneously. It is essential that gravity waves are
-represented in order to adjust the fluid to geostrophic balance, but
-it is less important to accurately model the speed of gravity waves.
+resolution. However, the accurate representation of gravity waves
+has proven to be more important for atmospheric modelling, and was
+chosen for the following Met-Office model \citep{DCM+05}. This may
+seem counter intuitive, considering that \citet{CFvN50} described
+these waves as ``entirely irrelevant gravity motions''. They are
+not irrelevant. They are the mechanism by which the flow comes into
+geostrophic balance -- if there is a region of high geopotential
+height but no flow at the edge, then gravity waves will radiate out,
+flow will be created and the fluid will move towards geostrophic balance
+(a process called geostrophic adjustment). If gravity waves are filtered
+then this process is assumed to happen instantaneously. It is essential
+that gravity waves are represented in order to adjust the fluid to
+geostrophic balance, but it is less important to accurately model
+the speed of gravity waves.
 
 The D-grid may appear ideal for representing fluids that are close
 to geostrophic balance, since the terms involved in geostrophic balance
-are the largest in the momentum equation (for example, $v$ is in
-the same place as the most compact calculation of $\partial p/\partial x$).
-However these are both terms in the $u$ equation, and $u$ is at
-a different location, meaning that averaging of large terms is needed
-for the D-grid. The E-grid is the same as the B-grid but rotated by
-45\textsuperscript{o}.
+are the largest in the momentum equation, and these are co-located
+on the D-grid (for example, $v$ is in the same place as the most
+compact calculation of $\partial p/\partial x$). However these are
+both terms in the $u$ equation, and $u$ is at a different location,
+meaning that averaging of large terms is needed for the D-grid. The
+E-grid is the same as the B-grid but rotated by 45\textsuperscript{o}.
 
 \subsubsection{Exercise: Two dimensional Shallow Water Equation Solutions}
 
@@ -808,13 +830,15 @@ at these longer lead times was made possible when they switched from
 finite differences to the spectral method \citep{GJ82,SBJ+89}. Spectral
 methods have exponential convergence, which means that they have the
 highest possible order of accuracy for the number of grid points.
-This comes at the cost of all to all communication. This sounds like
-a problem for massively parallel computers. ECMWF's spectral model
-is continuing to scale well -- but we do not know how long can this
-continue, when it is competing with methods that communicate only
-locally. The spectral method is also inherently global -- it is not
-suited for local area models, and the ECMWF spectral model is only
-efficient in hydrostatic mode, whereas the real atmosphere is non-hydrostatic. 
+This comes at the cost of all to all communication -- all grid points
+need information from every other grid point. This sounds problematic
+for massively parallel computers in which communication between processors
+can be expensive. ECMWF's spectral model is continuing to scale well
+-- but we do not know how long can this continue, when it is competing
+with methods that communicate only locally. The spectral method is
+also inherently global (so is not suited for local area models), and
+the ECMWF spectral model is only efficient in hydrostatic mode, whereas
+the real atmosphere is non-hydrostatic. 
 
 This section gives a simple example of a spectral method. \citet{Dur11}
 provides a more general definition. In order to solve
@@ -823,9 +847,10 @@ provides a more general definition. In order to solve
 \end{equation}
 for some function, $F$, we represent $\phi$ as a sum of globally
 defined basis functions. For simplicity, we will consider a one-dimensional
-periodic domain, with $x\in[-\pi,\pi]$, so that $\phi$ can be represented
-as a sum of $2N+1$ Fourier modes, $e^{ikx}$, with Fourier coefficients,
-$a_{k}\left(t\right)$:
+periodic domain, with $x\in[-\pi,\pi]$ and with values of $\phi$
+at $N$ uniformly spaced locations. This means that $\phi$ can be
+represented as a sum of $2N+1$ Fourier modes, $e^{ikx}$, with Fourier
+coefficients, $a_{k}\left(t\right)$:
 \begin{equation}
 \phi\left(x,t\right)=\sum_{k=-N}^{N}a_{k}\left(t\right)e^{ikx}.\label{eq:FourierDecomp}
 \end{equation}
@@ -853,10 +878,12 @@ is substituted into (\ref{eq:generalPDE}), (\ref{eq:generalPDE})
 is satisfied as closely as possible. For the spectral method ``as
 closely as possible'' means the Galerkin approximation:
 \begin{equation}
-\int_{-\pi}^{\pi}\left\{ \frac{\partial\phi}{\partial t}+F\left(\phi\right)\right\} e^{-ikx}dx=0\ \forall k\in-N,...,N.\label{eq:spectralGalerkin}
+\int_{-\pi}^{\pi}\left\{ \frac{\partial\phi}{\partial t}+F\left(\phi\right)\right\} e^{-ikx}dx=0\ \forall k\in-N,...,N\label{eq:spectralGalerkin}
 \end{equation}
-Substituting (\ref{eq:FourierDecomp}) into (\ref{eq:spectralGalerkin}),
-using the orthogonality of the Fourier modes and simplifying gives:
+(meaning that the residual of the PDE is orthogonal to every Fourier
+basis function in the truncated space). Substituting (\ref{eq:FourierDecomp})
+into (\ref{eq:spectralGalerkin}), using the orthogonality of the
+Fourier modes and simplifying gives:
 \begin{equation}
 2\pi\frac{da_{k}}{dt}+\int_{-\pi}^{\pi}F\left(\sum_{q=-N}^{N}a_{q}\left(t\right)e^{iqx}\right)e^{-ikx}dx=0.\label{eq:spectralMethod}
 \end{equation}
@@ -871,7 +898,7 @@ $F\left(\phi\right)=u\ \partial\phi/\partial x$ with a constant,
 uniform wind speed $u$. Then (\ref{eq:spectralMethod}) simplifies
 to
 \begin{equation}
-\frac{da_{k}}{dt}=iua_{k}\label{eq:spectralLinearAdvect}
+\frac{da_{k}}{dt}=-iuka_{k}\label{eq:spectralLinearAdvect}
 \end{equation}
 which can be solved either analytically or numerically for each $a_{k}$,
 starting from the initial conditions, $a_{k}\left(t_{0}\right)$ from
@@ -901,13 +928,16 @@ Write a code to solve an equation using the spectral method.}
 
 \subsection{Semi-Lagrangian Advection}\label{subsec:SL}
 
-Until the use of semi-Lagrangian advection, time steps in weather
-and climate models had been limited by the advection Courant number
-(\ref{eq:Courant}) so that, typically, air or its properties cannot
-be transported more than one grid box in one time step. This is particularly
-problematic on a latitude-longitude grid (fig \ref{fig:grids}) in
-which lines of constant longitude converge towards the poles making
-the time step restriction prohibitive. Before semi-Lagrangian advection,
+The semi-implicit method, described in \ref{subsec:SI}, was a crucial
+breakthrough, enabling long time steps with respect to acoustic and
+gravity wave speeds, but not with respect to wind speed. Before semi-Lagrangian
+advection, time steps in weather and climate models were limited by
+the advection Courant number (\ref{eq:Courant}) so that, typically,
+air or its properties could not be transported more than one grid
+box in one time step. This is particularly problematic on a latitude-longitude
+grid (fig \ref{fig:grids}) in which lines of constant longitude converge
+towards the poles. This makes the grid spacing tight which makes the
+time step restriction prohibitive. Before semi-Lagrangian advection,
 prohibitive time step restrictions near the poles were ameliorated
 using polar filtering \citep[eg.][]{CD91}, in which short wavelength
 waves in the zonal direction (along lines of constant latitude) were
@@ -931,17 +961,18 @@ one grid box in one time step. Meteorologists like to keep advection
 (or transport) explicit, for least cost and best accuracy, but it
 is possible, using Lagrangian approximations, to move the domain of
 dependence to where it is needed. This is how semi-Lagrangian works.
-Instead of approximating spatial gradients on the grid, we look upstream
-to where things came from, and map the old upstream values onto the
-grid at the new time level. We want to evaluate $\psi_{i,j}^{(n+1)}$
-(see figure \ref{fig:semiLagrangian} left). We need to know where
-it came from at time $n$, the departure point, $d$, which probably
-won't fall on a grid point. So the values of $\psi^{(n)}$ on the
-grid need to be interpolated onto $d$, which gives us the new value,
-$\psi_{i,j}^{(n+1)}$. Semi-Lagrangian enables long, stable and accurate
-time steps, but the properties transported are not conserved. This
-means that there can be spurious sources and sinks of mass, energy,
-moisture, or anything else that is transported by the model. 
+Instead of approximating spatial gradients on the grid, as is done
+for Eulerian methods, we look upstream to where things came from,
+and map the old upstream values onto the grid at the new time level.
+We want to evaluate $\psi_{i,j}^{(n+1)}$ (see figure \ref{fig:semiLagrangian}
+left). We need to know where it came from at time $n$, which is called
+the departure point, $d$. The departure point probably won't fall
+on a grid point, so the values of $\psi^{(n)}$ on the grid need to
+be interpolated onto point $d$, which gives us the new value, $\psi_{i,j}^{(n+1)}=\psi_{d}^{(n)}$.
+Semi-Lagrangian enables long, stable and accurate time steps, but
+the properties transported are not properly conserved. This means
+that there can be spurious sources and sinks of mass, energy, moisture,
+or anything else that is transported by the model. 
 
 \begin{figure}
 \resizebox{0.48\textwidth}{!}{\input{climate_numFigures/semiLagrange/semiLagrange.pdftex_t}}
@@ -959,7 +990,7 @@ area. }\label{fig:semiLagrangian}
 \end{figure}
 
 
-\subsubsection{Semi-Lagrangian Exercise}
+\subsubsection{Semi-Lagrangian Exercise}\label{subsec:ExSL}
 
 \todo[inline]{Semi-Lagrangian solution of linear advection and Burgers
 equation in 1D. Look at conservation and accuracy for large time steps.}
@@ -979,15 +1010,18 @@ had more than one processor, running in parallel. In the 1990s, Crays
 had 2, 4, 8 or of 16 processors. The atmosphere was decomposed into
 a domains, one for each processor, and the equations of motion were
 solved separately on each domain, with communication at the boundaries.
-Each processor operated on a vector of numbers at the same time, with
-vector lengths typically of 8, 16, 32 or 64. The 1970s to 1990s was
-a time of rapid increases in computational power, with gains in efficiency
-due to increases in vector length and number of processors \citep[eg.][]{BDI+95}.
-With this moderate parallelisation and moderate domain size, performance
-was not limited by parallel communication or memory band width. These
-were the day of Moore's law, with computational power doubling every
-two years, which enabled steady increases in model resolution without
-drastic changes to the numerical methods or algorithms.
+Each Cray processor operated on a vector of numbers at the same time,
+with vector lengths typically of 8, 16, 32 or 64 words. The 1970s
+to 1990s was a time of rapid increases in computational power, with
+gains in efficiency due to increases in vector length and number of
+processors \citep[eg.][]{BDI+95}. With this moderate parallelisation
+(2-16 processors) and consequent moderate domain size (1/16 to 1/2
+of the globe), performance was not limited by parallel communication
+or memory band width. During the 1970s to 1990s, computational power
+was increasing in line with Moore's law: the number of transistors
+on a microchip was doubling every two years. This enabled steady increases
+in model resolution without drastic changes to the numerical methods
+or algorithms.
 
 Even in the 1990s, vector-parallel machines were being replaced by
 machines with far more, cheaper, off the shelf microprocessors. Into
@@ -997,39 +1031,39 @@ and more, smaller domains, all with overlapping halo regions at their
 edges, where information is exchanged.
 
 At time of writing the operational model used by the UK Met Office,
-EndGame, still uses a latutide-longitude grid, and has consistently
+EndGame, still uses a latitude-longitude grid, and has consistently
 been one of the most accurate models, usually second only to ECMWF
-\citep[eg.][]{HJV+24}. However the combination of further parallelisation,
+\citep[eg.][]{HJV+24}. However, the combination of further parallelisation,
 increased resolution and the convergence of meridians towards the
 poles means that parallelisation progress on latitude-longitude grids
-is stuck -- more processors are added, domains get smaller and the
-code does not run faster. It is not possible to overcome the large
-amount of communication that must be done near the poles to make latitude-longitude
-usable at modern high resolutions. 
+is stuck -- more processors are added, the domain on each processor
+gets smaller and the code does not run faster. It is not possible
+to overcome the large amount of communication that must be done near
+the poles to make latitude-longitude usable at modern high resolutions. 
 
 \subsection{Modern Parallel Computers}
 
-The current ECMWF supercomputer has 7,680 AMD Epyc compute nodes \citep{ECMWFcomputer26}
-which are similar to the CPUs on desktop or laptop computers. The
-National Oceanic and Atmospheric Administration (NOAA) uses a cluster
-of 63,840 cores, including CPUs and GPUs (graphical processing units),
-since GPUs are now being used to provide vector calculations which
-are faster that the one at a time calculations on each CPU core \citep{NOAA_HERA26}.
+The current ECMWF supercomputer has 7,680 AMD Epyc compute nodes,
+with 128 cores per node \citep{ECMWFcomputer26}. The National Oceanic
+and Atmospheric Administration (NOAA) uses a cluster of 63,840 cores,
+including CPUs and GPUs (graphical processing units), since GPUs are
+now being used to provide vector calculations which are faster that
+the one at a time calculations on each CPU core \citep{NOAA_HERA26}.
 However the weather prediction models can rarely use the whole of
 any modern supercomputer because, even if the whole computer were
-available, the model would not scale well enough to use so many processors
-efficiently; processors would end up spending too much time waiting
-for data from neighbouring processors. This is the parallel scaling
-problem. The current Met Office model, on a latitude-longitude grid,
-can use thousands of processors efficiently, but not tens of thousands
-\citep{WBB+17}, which is needed for the most accurate, highest resolution
-solutions. In order to scale in parallel on 10s or 100s of thousands
-of processor, quasi-uniform meshes of the sphere are needed, which
-do not have convergence of points towards the poles. The next Met
-Office model, LFRic, uses a quasi-uniform mesh and \citet{BBD+26}
-demonstrated scaling to 383,216 CPUs on ARCHER2, which uses AMD Epyc
-compute nodes. LFRic should be operational by the time you read this.
-More on LFRic in sections \ref{subsec:FFSL} and \ref{subsec:mixedFEM}.
+available, the model would not scale well enough to use so many cores
+efficiently; cores would end up spending too much time waiting for
+data from neighbours. This is the parallel scaling problem. The current
+Met Office model, on a latitude-longitude grid, can use thousands
+of cores efficiently, but not tens of thousands \citep{WBB+17}, which
+is needed for the most accurate, highest resolution solutions. In
+order to scale in parallel on tens or hundreds of thousands of cores,
+quasi-uniform meshes of the sphere are needed, which do not have convergence
+of points towards the poles. The next Met Office model, LFRic, uses
+a quasi-uniform mesh and \citet{BBD+26} demonstrated scaling of LFRic
+to 393,216 cores on ARCHER2 (which uses AMD Epyc compute nodes). LFRic
+should be operational by the time you read this ... More on LFRic
+in sections \ref{subsec:FFSL} and \ref{subsec:mixedFEM}.
 
 \subsection{Meshes of the Sphere}
 
@@ -1048,13 +1082,13 @@ despite being on different processors. This inevitably slows the simulation
 down. At modern resolutions, latitude-longitude grids are not merely
 inefficient, they are a fundamental barrier to scalability. This century,
 weather prediction has been moving away from the latitude-longitude
-grid due (in part) to the parallel scaling bottle necks as the number
+grid due (in part) to the parallel scaling bottlenecks as the number
 of parallel processors increases. Even before parallel scaling was
-a critical bottleneck, ECMWF moved to a reduced grid, with coarser
-resolution towards the poles \citep{HS91} in order to save in computation
-time and memory requirement. This was more straightforward using a
-spectral model than a grid point model as they key point was to use
-few wavenumbers close to the poles. 
+a critical bottleneck, ECMWF moved to a reduced latitude-longitude
+grid, with coarser resolution towards the poles \citep{HS91} in order
+to save in computation time and memory requirement. This was more
+straightforward using a spectral model than a grid point model as
+they key point was to use few wavenumbers close to the poles. 
 
 \begin{figure}
 \includegraphics[width=0.32\textwidth]{climate_numFigures/grids/latLon}
@@ -1068,25 +1102,22 @@ convergence of the meridians towards the poles. The cubed-sphere mesh
 
 \citet{ST12} reviewed meshes of the sphere, describing the challenges
 in finding sufficiently accurate numerical methods for meshes such
-as the cubed sphere (middle of fig \ref{fig:grids}) and icosahedral
-meshes (eg. the hexagonal icosahedron, right of fig \ref{fig:grids},
-which actually contains 12 pentagons). The cubed sphere in fig \ref{fig:grids}
-is quasi-uniform -- all of the grid boxes have similar dimensions
-and a low aspect ratio. However the distortions mean that simple finite
-differences are no longer accurate. Meshes of polygons (such a the
-hexagonal icosahedron, right of fig \ref{fig:grids}) and meshes of
-triangles are also quasi-uniform but these shapes can cause other
-problems (see section \ref{subsec:FV_AC}).
+as the cubed sphere and icosahedral meshes (fig \ref{fig:grids}).
+The cubed sphere in fig \ref{fig:grids} is quasi-uniform -- all
+of the grid boxes have similar dimensions and a low aspect ratio.
+However the distortions mean that simple finite differences are no
+longer accurate. Meshes of polygons (such a the hexagonal icosahedron,
+right of fig \ref{fig:grids}) and meshes of triangles are also quasi-uniform
+but these shapes can cause other problems (see section \ref{subsec:FV_AC}).
 
-\section{Numerical Methods for the Future}
+\section{More Advanced Methods}
 
 The numerical methods developed for latitude-longitude grids, such
 as semi-implicit, semi-Lagrangian and the Arakawa C-grid have superb
 accuracy and are efficient as long as the domain is not decomposed
 onto too many parallel processors, which is needed on modern computers.
-Moving to alternative meshes, such as the cubed sphere or icosahedra
-(fig. \ref{fig:grids}), means that more complex numerical methods
-are needed in order to retain accuracy. 
+Alternative meshes, such as the cubed sphere or icosahedra (fig. \ref{fig:grids}),
+need more complex numerical methods to retain accuracy. 
 
 \subsection{Finite volumes}\label{subsec:FV}
 
@@ -1106,14 +1137,13 @@ varies inside a divergence term. We can start with the continuity
 equation (\ref{eq:cont}) which can be re-written in flux form using
 vector-calculus identities
 \begin{equation}
-\frac{\partial\rho}{\partial t}+\mathbf{u}\cdot\rho+\rho\nabla\cdot\mathbf{u}=0\implies\frac{\partial\rho}{\partial t}+\nabla\cdot\left(\mathbf{u}\rho\right)=0.\label{eq:contFlux}
+\frac{\partial\rho}{\partial t}+\mathbf{u}\cdot\nabla\rho+\rho\nabla\cdot\mathbf{u}=0\implies\frac{\partial\rho}{\partial t}+\nabla\cdot\left(\mathbf{u}\rho\right)=0.\label{eq:contFlux}
 \end{equation}
 The finite volume method predicts density weighted volume averages
-(for example $\rho\phi$, the mass of an atmospheric constituent,
-$\phi$) in each cell. We can derive an equation for the rate of change
-of $\rho\phi$ using the continuity equation (\ref{eq:contFlux}),
-the linear advection equation for $\phi$ (\ref{eq:linAdvect}) and
-the chain rule:
+(for example $\rho\phi$, the mass of a concentration, $\phi$) in
+each cell. We can derive an equation for the rate of change of $\rho\phi$
+using the continuity equation (\ref{eq:contFlux}), the linear advection
+equation for $\phi$ (\ref{eq:linAdvect}) and the chain rule:
 \begin{align}
 \frac{\partial\rho\phi}{\partial t} & =\rho\frac{\partial\phi}{\partial t}+\phi\frac{\partial\rho}{\partial t}=\rho\left\{ -\mathbf{u}\cdot\nabla\phi\right\} +\phi\left\{ -\nabla\cdot\left(\mathbf{u}\rho\right)\right\} \nonumber \\
 \implies\frac{\partial\rho\phi}{\partial t} & +\nabla\cdot\left(\rho\mathbf{u}\phi\right)=0.\label{eq:linAdvectFlux}
@@ -1177,17 +1207,16 @@ $\partial\phi/\partial x$ as the centred finite difference method
 
 The semi-Lagrangian method, described in section \ref{subsec:SL},
 has played a large role in enabling unprecedented accuracy in weather
-prediction. However standard (interpolating) semi-Lagrangian is not
+prediction. However, standard (interpolating) semi-Lagrangian is not
 conservative -- the total mass of the quantity advected can change
 just because it is being moved around. This is not correct and makes
-semi-Lagrangian unsuitable for climate prediction and for the next
-generation in weather prediction. A popular solution is flux-form
-semi-Lagrangian (FFSL), which is a type of finite volume advection
-scheme. FFSL is used in FV3 by the National Oceanic and Atmospheric
-Administration \citep[NOAA,][]{HCP+21}, in the NCAR Community Atmosphere
-Model, CAM-FV \citep{NRC+10}, in the Japanese NICAM \citep{Miu07b},
-in the German ICON model \citep{ZRR+15,ICON26} and will be used in
-the next Met Office model, LFRic \citep{BK25}. 
+semi-Lagrangian unsuitable for climate prediction and for next-generation
+models. A popular solution is flux-form semi-Lagrangian (FFSL), which
+is a type of finite volume advection scheme. FFSL is used in FV3 by
+the National Oceanic and Atmospheric Administration \citep[NOAA,][]{HCP+21},
+in the NCAR Community Atmosphere Model, CAM-FV \citep{NRC+10}, in
+the Japanese NICAM \citep{Miu07b}, in the German ICON model \citep{ZRR+15,ICON26}
+and will be used in the next Met Office model, LFRic \citep{BK25}. 
 
 Rather than interpolating onto a departure point, in FFSL, interpolation
 is onto the volume of air that sweeps through each face in a time
@@ -1213,21 +1242,21 @@ note is SWIFT \citep{BK25} which extends the long time step stability,
 conservation and constancy preservation to variable density advection,
 providing the advection scheme for the new Met Office model, LFRic. 
 
-In many ways, PPM and FFSL seem unbeatable. The only down side is
-that, in order to achieve efficiency for large time steps, the grid
-must be be regular. That means that the grid must consist of (possibly
-distorted) boxes that are arranged in the Cartesian directions. This
-is because the COSMIC splitting that is used to transform a scheme
+In many ways, PPM and FFSL seem unbeatable. The only downside is that,
+in order to achieve efficiency for large time steps, the grid must
+be be regular. That means that the grid must consist of (possibly
+distorted) boxes that are arranged in the co-ordinate directions.
+This is because the COSMIC splitting that is used to transform a scheme
 like PPM from one to two and three dimensions, relies on searching
 for departure points along co-ordinate directions. This precludes
 the use of FFSL with large time steps for icosahedral meshes, and
 means that special measures are needed to handle the corners of the
 cubed-sphere mesh. 
 
-\subsubsection{Exercises: Finite Volume Solutions of the Advection Equation}
+\subsubsection{Exercises: Finite Volume Solutions of the Advection Equation}\label{subsec:exFvAdvection}
 \begin{enumerate}
 \item Starting from the flux-form linear advection equation (\ref{eq:linAdvectFlux}),
-prove constant preservation; that if the advected quantity, $\phi$,
+prove constancy preservation; that if the advected quantity, $\phi$,
 starts uniform, then it will stay uniform, given the following assumptions:
 \begin{enumerate}
 \item The density is uniform and $\nabla\cdot\mathbf{u}=0$ (incompressible
@@ -1268,7 +1297,7 @@ a finite volume mesh can include cells of arbitrary shapes, such as
 the triangles, pentagons and hexagons in icosahedral meshes (fig.
 \ref{fig:grids}). 
 
-The purest form of finite volume is co-located, the A-grid, so that
+A simple form of finite volume is co-located, the A-grid, so that
 the velocity is stored as volume averages in the cells, the same as
 the variables that are advected by the wind. This approach is used
 effectively by NICAM \citep{SMT+08} which stores all variables apart
@@ -1284,25 +1313,25 @@ models on various grids, the A-grid is prone to grid-scale oscillations,
 which can usually be smoothed out with some kind of diffusion or filter.
 This has motivated the development of C-grid discretisations on triangles
 for the ICON model \citep{Bon04,ZRR+15} and on hexagons and pentagons
-for, example, MPAS \citep{TRSK09,SKD+12,RPH+13}. ICON produces skilful
+for example, MPAS \citep{TRSK09,SKD+12,RPH+13}. ICON produces skilful
 global weather forecasts, but the underlying dynamical core is still
 prone to grid-scale oscillations and requires diffusion. It turns
 out that the C-grid on triangles is not as well behaved as hoped.
 Spurious steady solutions with pressure oscillations between up and
 down pointing triangles persist because the alternating high and low
 pressures are in geostrophic balance with winds circulating around
-each triangle. \citet{Gas11} explained that the oscillations on triangles
-cannot be controlled by the insufficient normal velocity components
-at the triangle edges, and that the hexagonal C-grid performs better.
-MPAS, the ``Model for Prediction Across Scales'', was developed
-as a global version of the popular WRF model and uses the hexagonal
-C-grid \citep{SKD+12}. It is free of grid-scale oscillations in height
-or pressure, but spurious grid-scale circulations can appear around
-the hexagon vertices, a manifestation of the Hollingsworth instability
-\citep{Gas13}. 
+each triangle. \citet{Gas11} explained why the oscillations on triangles
+cannot be controlled by the winds over the triangle edges, and that
+the hexagonal C-grid performs better (the explanation is tricky but
+the result is important). MPAS, the ``Model for Prediction Across
+Scales'', was developed as a global version of the popular WRF model
+and uses the hexagonal C-grid \citep{SKD+12}. It is free of grid-scale
+oscillations in height or pressure, but spurious grid-scale circulations
+can appear around the hexagon vertices, a manifestation of the Hollingsworth
+instability \citep{Gas13}. 
 
 Finite-volume methods for wave equations (such as the A- and C-grid
-finite voulme methods), tend to be low-order accurate -- usually
+finite volume methods), tend to be low-order accurate -- usually
 up to second-order. However, despite the smooth, well behaved solutions,
 the C-grid on the hexagonal-icosahedron is found to be much less than
 second-order, with a complete loss of convergence with resolution
@@ -1311,22 +1340,22 @@ to move to more complex numerical methods for quasi-uniform meshes.
 
 \subsection{Spectral Elements}\label{subsec:SE}
 
-Spectral elements enables arbitrarily high-order accuracy on a variety
+Spectral elements enable arbitrarily high-order accuracy on a variety
 of meshes, and are efficient on massively parallel computers. Fourth-order
 accurate spectral elements are used in a version of NCAR Community
 Atmosphere Model, CAM-SE \citep{NRC+10,ELM+13} on a cubed sphere
 (fig. \ref{fig:CAMSE}, right). Considering just the horizontal discretisation
 in CAM-SE, the surface of the Earth is divided into quadrilateral
 elements (fig. \ref{fig:CAMSE}, left). The solution is approximated
-on each element using a basis function which is a two-dimensional,
-third-order polynomial. A key advantage of spectral elements is that
-they use Lagrange interpolation \citep{WTB+07} which means that the
-basis functions passes through nodes on each element exactly and the
-weights of each basis function are cheap to compute and avoid global
-communication. By placing these notes at Gauss-Legendre-Lobatto quadrature
-points (fig. \ref{fig:CAMSE}, left) the order of accuracy is one
-more than the degree of the polynomial used, so the third-order polynomial
-basis functions give a fourth-order accurate numerical method.
+on each element using two-dimensional, third-order polynomial basis
+functions. A key advantage of spectral elements is that they use Lagrange
+interpolation \citep{WTB+07} which means that the basis functions
+pass through nodes on each element exactly and the weights of each
+basis function are cheap to compute and avoid global communication.
+By placing these nodes at Gauss-Legendre-Lobatto quadrature points
+(fig. \ref{fig:CAMSE}, left) the order of accuracy is one more than
+the degree of the polynomial used, so the third-order polynomial basis
+functions gives fourth-order accuracy in space.
 
 \begin{figure}
 \includegraphics[width=1\textwidth]{climate_numFigures/cubedSphereSEM}
@@ -1347,7 +1376,7 @@ such as pressure, but less suitable for fields with more fine scale
 variability such as clouds and precipitation \citep{WTB+07}. The
 spectral element version of CAM produces a similar climate to the
 finite volume version \citep{ELM+13} but the spectral element version
-is more efficient on larger super computers and provides more detail
+is more efficient on large super computers and provides more detail
 at fine resolutions. 
 
 Spectral elements are continuous Galerkin methods. This means that
@@ -1365,10 +1394,10 @@ to maintain stability and smooth solutions \citep{GTU+14}.
 The discontinuous Galerkin method (DG) is similar to the spectral
 element method (a continuous Galerkin method), but discontinuities
 are allowed between elements. Like the finite volume method, there
-are fluxes between elements, leading to asymmetry, and more upwind
-information than downwind is used in calculations. DG can handle discontinuous
-fields without the need to introduce artificial diffusion, but is
-is more expensive. The cost is partly offset by the scaling properties
+are fluxes between elements and more upwind information than downwind
+is used in calculations. DG can handle discontinuous fields without
+the need to introduce artificial diffusion, but is is more expensive
+than spectral element. The cost is partly offset by the scaling properties
 on massively parallel computers. DG is not currently being used operationally
 for weather prediction but powerful research models exist such as
 NUMA-NEPTUNE, \citep{KG12} developed at the Naval Postgraduate School
@@ -1382,37 +1411,36 @@ operational.
 elements/compatible finite elements. Also talk more about LFRic and
 its name.}
 
-Superbly accurate simulaions are possible using spectral elements
-and discontinuous Galerkin methods (SE\&DG) and SE\&DG are highly
-scalable on parallel machines. However both SE\&DG have the same representation
-for pressure and velocity -- pressure and velocity use the same basis
-functions and are evaluated at the same quadrature points. This means
-that they will inevitably suffer from similar computational modes
-to the Arakawa A-grid -- grid-scale oscillations in pressure or velocity
-will not fully control each other. For SE\&DG these problems are not
-as severe as for the original A-grid because the order of accuracy
-is so much higher using SE\&DG. For SE, grid-scale oscillations are
-controlled by diffusion or filters. It seems ineffiecient to make
-the effort of high-order accuracy and applying filters just to control
-oscillations that shouldn't be there in the first place. This is where
-mixed finite elements come in.
+Spectral element and discontinuous Galerkin methods (SE \& DG) are
+highly scalable on parallel machines, and have superb accuracy. However,
+both SE \& DG are co-located -- pressure and velocity use the same
+basis functions and are evaluated at the same quadrature points. This
+means that they will inevitably suffer from similar computational
+modes to the Arakawa A-grid -- grid-scale oscillations in pressure
+or velocity will not fully control each other \citep{MST12}. For
+SE \& DG, these problems are not as severe as for the original A-grid
+because the order of accuracy is much higher using SE \& DG. For SE,
+grid-scale oscillations are controlled by diffusion or filters. It
+seems inefficient to make the effort of high-order accuracy to then
+apply filters to control oscillations that shouldn't be there in the
+first place. This is where mixed finite elements come in.
 
 Mixed finite elements have different basis functions for pressure
 and velocity in order to eliminate computational modes like those
 of the A-grid. \citet{CS12} described how mixed finite elements can
 be used to achieve conservation and balance properties equivalent
 to a C-grid but on irregular meshes such as the cubed-sphere and triangular
-icosaheron. This works using the lowest order elements (for second-order
+icosahedron. This works using the lowest-order elements (for second-order
 accuracy) and for higher-order elements. This comes at the cost of
 inverting a mass matrix a few times every time step, in order to find
-the basis function weights, but the solution of mass matrices is more
-efficient and more scalable than the pressure equations solved in
+the basis function coefficients. However, the solution of mass matrices
+is much cheaper than solving the pressure equations solved, as in
 the semi-implicit method. Care is needed when choosing the basis functions
 for pressure and velocity. In two dimensions, there should be twice
 as many velocity degrees of freedom as pressure degrees of freedom
 so that oscillations in one variable in each direction are fully controlled
-by the other. This is necessary but not sufficient condition to fully
-control all possible oscillations. 
+by the other. This is a necessary but not sufficient condition to
+fully control all possible oscillations. 
 
 Mixed finite elements are used in the new Met Office model, LFRic
 (named after L.F. Richardson who kicked off this chapter). LFRic uses
@@ -1420,7 +1448,7 @@ the lowest order element pair for the acoustic and gravity wave terms
 of the primitive equations on a cubed sphere \citep{AFH+19}, while
 advection uses their new SWIFT FFSL scheme (section \ref{subsec:FFSL}).
 LFRic is producing results as accurate as their latitude-longitude
-model with far superiour parallel scaling \citep{BBD+26}. Hopefully
+model with far superior parallel scaling \citep{BBD+26}. Hopefully
 it will be in use for operations by the time this book is published.
 
 \section{Is Machine Learning the Future of Weather and Climate Prediction}
@@ -1430,7 +1458,7 @@ prediction. Unlike traditional numerical models, ML approaches generate
 forecasts directly from historical data, without solving the governing
 equations of motion. The first ML models to surpass the skill of state-of-the-art
 physical models were the graph neural network of \citet{Keis22} and
-Pangu-Weather \citep{BXZ+22}, both trained on data from ECMWF. Although
+Pangu-Weather \citep{BXZ+22}, both trained on ECMWF data. Although
 the training of these data-driven models is computationally expensive,
 once trained they can produce forecasts at a small fraction of the
 cost of conventional numerical models. Like traditional models, ML
@@ -1438,32 +1466,16 @@ weather models operate on meshes of the sphere, but they typically
 advance in much larger time steps, of order six hours rather than
 minutes, contributing to their computational efficiency.
 
-This century, the improvements to skill in the ECMWF forecast have
+This century, the improvements to skill in weather forecasts have
 been slowing, in part due to the lack of additional computer power
-in order to create ever higher resolution simulations \citep{Baue24}.
+in order to create ever higher resolution simulations \citep[as shown by][for the ECMWF model]{Baue24}.
 ECMWF have developed AIFS (Artificial Intelligence Forecasting System),
 a data-driven model that has boosted ECMWF forecast performance and
-runs at higher resolution for much reduced cost. 
+runs at higher resolution for much reduced cost, and other forecasting
+centres are close behind. 
 
-So should physical models be abandoned? Not yet. The power of physical
-models is that they can predict situations that have not yet been
-seen, such as climate change, whereas ML models find analogues in
-the past to make predictions. The best climate models of the future
-will by a hybrid of the two. Google Scholar just returned 7.3K results
-searching for `{}``hybrid'' ``machine learning'' ``climate'''.
-
-\section{Key Messages}
-\begin{itemize}
-\item Fast waves can dominate numerical stability, not forecast skill.
-\item Semi\nobreakdash-implicit time stepping and elliptic solves remove
-these constraints.
-\item Grid staggering controls grid-scale oscillations and computational
-modes.
-\item The spectral method is hard to beat.
-\item Flux-form semi-Lagrangian is hard to beat for advection.
-\item Latitude-longitude grids do not scale to exascale computing. -- quasi-uniform
-meshes are needed.
-\item Machine learned weather prediction models are cheaper, once they are
-trained. They cannot yet predict climate.
-\end{itemize}
-
+So should physical models be abandoned? No. Physical models can predict
+new realities, such as climate change, whereas ML models base their
+predictions on analogues in the past. The best climate models of the
+future may be a hybrid of the two. Google Scholar just returned 7.3K
+results searching for `{}``hybrid'' ``machine learning'' ``climate'''.

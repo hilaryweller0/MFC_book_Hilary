@@ -5883,7 +5883,7 @@ nolink "false"
 \end_layout
 
 \begin_layout Standard
-The purest form of finite volume is co-located,
+A simple form of finite volume is co-located,
  the A-grid,
  so that the velocity is stored as volume averages in the cells,
  the same as the variables that are advected by the wind.
@@ -5926,8 +5926,7 @@ literal "false"
 
 \end_inset
 
- and on hexagons and pentagons for,
- example,
+ and on hexagons and pentagons for example,
  MPAS 
 \begin_inset CommandInset citation
 LatexCommand citep
@@ -5949,8 +5948,8 @@ literal "false"
 
 \end_inset
 
- explained that the oscillations on triangles cannot be controlled by the insufficient normal velocity components at the triangle edges,
- and that the hexagonal C-grid performs better.
+ explained why the oscillations on triangles cannot be controlled by the winds over the triangle edges,
+ and that the hexagonal C-grid performs better (the explanation is tricky but the result is important).
  MPAS,
  the 
 \begin_inset Quotes eld
@@ -5985,7 +5984,7 @@ literal "false"
 \end_layout
 
 \begin_layout Standard
-Finite-volume methods for wave equations (such as the A- and C-grid finite voulme methods),
+Finite-volume methods for wave equations (such as the A- and C-grid finite volume methods),
  tend to be low-order accurate – usually up to second-order.
  However,
  despite the smooth,
@@ -6015,7 +6014,7 @@ name "subsec:SE"
 \end_layout
 
 \begin_layout Standard
-Spectral elements enables arbitrarily high-order accuracy on a variety of meshes,
+Spectral elements enable arbitrarily high-order accuracy on a variety of meshes,
  and are efficient on massively parallel computers.
  Fourth-order accurate spectral elements are used in a version of NCAR Community Atmosphere Model,
  CAM-SE 
@@ -6055,8 +6054,8 @@ nolink "false"
 
 ,
  left).
- The solution is approximated on each element using a basis function which is a two-dimensional,
- third-order polynomial.
+ The solution is approximated on each element using two-dimensional,
+ third-order polynomial basis functions.
  A key advantage of spectral elements is that they use Lagrange interpolation 
 \begin_inset CommandInset citation
 LatexCommand citep
@@ -6065,8 +6064,8 @@ literal "false"
 
 \end_inset
 
- which means that the basis functions passes through nodes on each element exactly and the weights of each basis function are cheap to compute and avoid global communication.
- By placing these notes at Gauss-Legendre-Lobatto quadrature points (fig.
+ which means that the basis functions pass through nodes on each element exactly and the weights of each basis function are cheap to compute and avoid global communication.
+ By placing these nodes at Gauss-Legendre-Lobatto quadrature points (fig.
  
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -6080,7 +6079,7 @@ nolink "false"
 
 ,
  left) the order of accuracy is one more than the degree of the polynomial used,
- so the third-order polynomial basis functions give a fourth-order accurate numerical method.
+ so the third-order polynomial basis functions gives fourth-order accuracy in space.
 \end_layout
 
 \begin_layout Standard
@@ -6167,7 +6166,7 @@ literal "false"
 
 \end_inset
 
- but the spectral element version is more efficient on larger super computers and provides more detail at fine resolutions.
+ but the spectral element version is more efficient on large super computers and provides more detail at fine resolutions.
  
 \end_layout
 
@@ -6207,11 +6206,9 @@ Discontinuous Galerkin
 The discontinuous Galerkin method (DG) is similar to the spectral element method (a continuous Galerkin method),
  but discontinuities are allowed between elements.
  Like the finite volume method,
- there are fluxes between elements,
- leading to asymmetry,
- and more upwind information than downwind is used in calculations.
+ there are fluxes between elements and more upwind information than downwind is used in calculations.
  DG can handle discontinuous fields without the need to introduce artificial diffusion,
- but is is more expensive.
+ but is is more expensive than spectral element.
  The cost is partly offset by the scaling properties on massively parallel computers.
  DG is not currently being used operationally for weather prediction but powerful research models exist such as NUMA-NEPTUNE,
  
@@ -6276,8 +6273,10 @@ status open
 \end_layout
 
 \begin_layout Standard
-Superbly accurate simulaions are possible using spectral elements and discontinuous Galerkin methods (SE & DG) and SE & DG are highly scalable on parallel machines.
- However both SE & DG have the same representation for pressure and velocity – pressure and velocity use the same basis functions and are evaluated at the same quadrature points.
+Spectral element and discontinuous Galerkin methods (SE & DG) are highly scalable on parallel machines,
+ and have superb accuracy.
+ However,
+ both SE & DG are co-located – pressure and velocity use the same basis functions and are evaluated at the same quadrature points.
  This means that they will inevitably suffer from similar computational modes to the Arakawa A-grid – grid-scale oscillations in pressure or velocity will not fully control each other 
 \begin_inset CommandInset citation
 LatexCommand citep
@@ -6287,10 +6286,11 @@ literal "false"
 \end_inset
 
 .
- For SE & DG these problems are not as severe as for the original A-grid because the order of accuracy is so much higher using SE & DG.
+ For SE & DG,
+ these problems are not as severe as for the original A-grid because the order of accuracy is much higher using SE & DG.
  For SE,
  grid-scale oscillations are controlled by diffusion or filters.
- It seems inefficient to make the effort of high-order accuracy and applying filters just to control oscillations that shouldn't be there in the first place.
+ It seems inefficient to make the effort of high-order accuracy to then apply filters to control oscillations that shouldn't be there in the first place.
  This is where mixed finite elements come in.
 \end_layout
 
@@ -6304,15 +6304,17 @@ literal "false"
 
 \end_inset
 
- described how mixed finite elements can be used to achieve conservation and balance properties equivalent to a C-grid but on irregular meshes such as the cubed-sphere and triangular icosaheron.
- This works using the lowest order elements (for second-order accuracy) and for higher-order elements.
+ described how mixed finite elements can be used to achieve conservation and balance properties equivalent to a C-grid but on irregular meshes such as the cubed-sphere and triangular icosahedron.
+ This works using the lowest-order elements (for second-order accuracy) and for higher-order elements.
  This comes at the cost of inverting a mass matrix a few times every time step,
- in order to find the basis function coefficients,
- but the solution of mass matrices is more efficient and more scalable than the pressure equations solved in the semi-implicit method.
+ in order to find the basis function coefficients.
+ However,
+ the solution of mass matrices is much cheaper than solving the pressure equations solved,
+ as in the semi-implicit method.
  Care is needed when choosing the basis functions for pressure and velocity.
  In two dimensions,
  there should be twice as many velocity degrees of freedom as pressure degrees of freedom so that oscillations in one variable in each direction are fully controlled by the other.
- This is necessary but not sufficient condition to fully control all possible oscillations.
+ This is a necessary but not sufficient condition to fully control all possible oscillations.
  
 \end_layout
 
@@ -6341,7 +6343,7 @@ nolink "false"
 \end_inset
 
 ).
- LFRic is producing results as accurate as their latitude-longitude model with far superiour parallel scaling 
+ LFRic is producing results as accurate as their latitude-longitude model with far superior parallel scaling 
 \begin_inset CommandInset citation
 LatexCommand citep
 key "BBD+26"
@@ -6379,7 +6381,7 @@ literal "false"
 \end_inset
 
 ,
- both trained on data from ECMWF.
+ both trained on ECMWF data.
  Although the training of these data-driven models is computationally expensive,
  once trained they can produce forecasts at a small fraction of the cost of conventional numerical models.
  Like traditional models,
@@ -6391,10 +6393,12 @@ literal "false"
 
 \begin_layout Standard
 This century,
- the improvements to skill in the ECMWF forecast have been slowing,
+ the improvements to skill in weather forecasts have been slowing,
  in part due to the lack of additional computer power in order to create ever higher resolution simulations 
 \begin_inset CommandInset citation
 LatexCommand citep
+after "for the ECMWF model"
+before "as shown by"
 key "Baue24"
 literal "false"
 
@@ -6402,7 +6406,8 @@ literal "false"
 
 .
  ECMWF have developed AIFS (Artificial Intelligence Forecasting System),
- a data-driven model that has boosted ECMWF forecast performance and runs at higher resolution for much reduced cost.
+ a data-driven model that has boosted ECMWF forecast performance and runs at higher resolution for much reduced cost,
+ and other forecasting centres are close behind.
  
 \end_layout
 
@@ -6411,8 +6416,8 @@ So should physical models be abandoned?
  No.
  Physical models can predict new realities,
  such as climate change,
- whereas ML finds analogues in the past to make predictions.
- The best climate models of the future will by a hybrid of the two.
+ whereas ML models base their predictions on analogues in the past.
+ The best climate models of the future may be a hybrid of the two.
  Google Scholar just returned 7.3K results searching for `
 \begin_inset Quotes eld
 \end_inset
@@ -6438,43 +6443,6 @@ climate
 \end_inset
 
 '.
-\end_layout
-
-\begin_layout Section
-Key Messages
-\end_layout
-
-\begin_layout Itemize
-Fast waves can dominate numerical stability,
- not forecast skill.
-\end_layout
-
-\begin_layout Itemize
-Semi\SpecialChar nobreakdash
-implicit time stepping and elliptic solves remove these constraints.
-\end_layout
-
-\begin_layout Itemize
-Grid staggering controls grid-scale oscillations and computational modes.
-\end_layout
-
-\begin_layout Itemize
-The spectral method is hard to beat.
-\end_layout
-
-\begin_layout Itemize
-Flux-form semi-Lagrangian is hard to beat for advection.
-\end_layout
-
-\begin_layout Itemize
-Latitude-longitude grids do not scale to exascale computing.
- – quasi-uniform meshes are needed.
-\end_layout
-
-\begin_layout Itemize
-Machine learned weather prediction models are cheaper,
- once they are trained.
- They cannot yet predict climate.
 \end_layout
 
 \end_body

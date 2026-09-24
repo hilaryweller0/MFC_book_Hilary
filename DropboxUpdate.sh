@@ -3,6 +3,8 @@ lyx --export pdflatex -f all main.lyx; \
 rmtexall main.tex
 cp main.pdf /home/hilary/Dropbox/MFC_book/climate_numFigures/HilaryMetNumerics.pdf
 
+ev main.pdf
+
 dropboxd &
 
 #cp -u metNumerics.tex /home/hilary/Dropbox/MFC_book/climate_num.tex
